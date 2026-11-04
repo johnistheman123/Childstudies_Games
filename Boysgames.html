@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Super Sports Party! ⚽🏈🏀</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka for playful kid typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', cursive, sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Vibrant animations */
+    @keyframes pulse-grow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.06); }
+    }
+    .animate-pulse-grow {
+      animation: pulse-grow 1.8s infinite ease-in-out;
+    }
+
+    @keyframes bounce-gentle {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .animate-bounce-gentle {
+      animation: bounce-gentle 1.2s infinite ease-in-out;
+    }
+
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(-3deg); }
+      50% { transform: rotate(3deg); }
+    }
+    .animate-wiggle {
+      animation: wiggle 0.6s infinite ease-in-out;
+    }
+
+    /* Giant responsive game buttons with deep kid-friendly shadows */
+    .btn-super {
+      box-shadow: 0 10px 0 0 rgba(0,0,0,0.25), inset 0 4px 0 0 rgba(255,255,255,0.4);
+      transition: all 0.1s ease;
+    }
+    .btn-super:active {
+      transform: translateY(6px);
+      box-shadow: 0 4px 0 0 rgba(0,0,0,0.25), inset 0 2px 0 0 rgba(255,255,255,0.4);
+    }
+
+    canvas {
+      image-rendering: pixelated;
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-white overflow-hidden select-none">
+
+  <!-- MAIN WRAPPER -->
+  <div class="relative w-screen h-screen flex flex-col justify-between items-center overflow-hidden bg-gradient-to-b from-sky-400 via-indigo-500 to-purple-600">
+
+    <!-- TOP NAVIGATION & HUD BAR -->
+    <header class="w-full p-3 sm:p-4 flex justify-between items-center z-30 pointer-events-auto">
+      <!-- Left Controls: Menu & Sound -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        <button id="homeBtn" class="hidden bg-yellow-400 hover:bg-yellow-300 text-yellow-950 font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-2xl btn-super flex items-center gap-2 text-lg sm:text-2xl">
+          🏠 <span class="hidden sm:inline">Menu</span>
+        </button>
+        <button id="soundBtn" class="bg-purple-400 hover:bg-purple-300 text-purple-950 font-bold px-3 py-2 sm:px-4 sm:py-3 rounded-2xl btn-super text-lg sm:text-2xl flex items-center gap-1">
+          <span id="soundIcon">🔊</span>
+          <span id="soundLabel" class="text-sm font-semibold hidden sm:inline">Music ON</span>
+        </button>
+      </div>
+
+      <!-- Center Title Display (Active Game Name) -->
+      <div id="gameTitleDisplay" class="bg-white/20 backdrop-blur-md px-4 py-1.5 sm:px-6 sm:py-2 rounded-full border-2 border-white/40 shadow-lg text-center">
+        <h1 id="activeGameText" class="text-lg sm:text-3xl font-extrabold tracking-wide drop-shadow text-yellow-300">
+          Super Sports Party! 🌟
+        </h1>
+      </div>
+
+      <!-- Right Display: Stars Counter -->
+      <div class="bg-yellow-400 text-yellow-950 px-3 py-1.5 sm:px-5 sm:py-2 rounded-full font-extrabold text-lg sm:text-3xl flex items-center gap-2 border-4 border-yellow-200 shadow-lg animate-pulse-grow">
+        <span class="text-2xl sm:text-4xl">⭐</span>
+        <span id="starCounter">0</span>
+      </div>
+    </header>
+
+    <!-- GAME CANVAS CONTAINER -->
+    <div class="relative flex-1 w-full flex items-center justify-center p-2 z-10 overflow-hidden">
+      <canvas id="gameCanvas" class="w-full h-full max-w-5xl max-h-[80vh] rounded-3xl shadow-2xl bg-sky-200 border-4 sm:border-8 border-white/80"></canvas>
+
+      <!-- HOME MENU OVERLAY -->
+      <div id="homeMenu" class="absolute inset-0 z-20 flex flex-col items-center justify-center p-4 bg-gradient-to-b from-sky-400/90 to-indigo-600/90 backdrop-blur-sm overflow-y-auto">
+        <div class="text-center mb-6 sm:mb-8 animate-bounce-gentle">
+          <h1 class="text-4xl sm:text-6xl md:text-7xl font-extrabold text-yellow-300 drop-shadow-[0_6px_0_rgba(0,0,0,0.3)] tracking-wider">
+            SUPER SPORTS!
+          </h1>
+          <p class="text-lg sm:text-2xl text-white font-semibold drop-shadow mt-1">
+            Pick a sport and let's play! 🎈
+          </p>
+        </div>
+
+        <!-- Mini-Game Selection Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full max-w-4xl px-4">
+          <!-- Soccer Card -->
+          <button onclick="startGame('soccer')" class="bg-gradient-to-b from-green-400 to-emerald-600 hover:from-green-300 hover:to-emerald-500 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
+            <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">⚽</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white drop-shadow">SOCCER</h2>
+            <p class="text-sm sm:text-base text-green-100 font-medium mt-1">Kick Goals into the Net! 🥅</p>
+            <span class="mt-4 bg-yellow-400 text-yellow-950 px-5 py-2 rounded-full font-extrabold text-lg sm:text-xl shadow">PLAY! ▶</span>
+          </button>
+
+          <!-- Football Card -->
+          <button onclick="startGame('football')" class="bg-gradient-to-b from-amber-500 to-orange-700 hover:from-amber-400 hover:to-orange-600 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
+            <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">🏈</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white drop-shadow">FOOTBALL</h2>
+            <p class="text-sm sm:text-base text-amber-100 font-medium mt-1">Throw for a Touchdown! 🏆</p>
+            <span class="mt-4 bg-yellow-400 text-yellow-950 px-5 py-2 rounded-full font-extrabold text-lg sm:text-xl shadow">PLAY! ▶</span>
+          </button>
+
+          <!-- Basketball Card -->
+          <button onclick="startGame('basketball')" class="bg-gradient-to-b from-orange-400 to-red-600 hover:from-orange-300 hover:to-red-500 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
+            <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">🏀</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white drop-shadow">BASKETBALL</h2>
+            <p class="text-sm sm:text-base text-orange-100 font-medium mt-1">Shoot Hoops & Score Swishes! 🗑️</p>
+            <span class="mt-4 bg-yellow-400 text-yellow-950 px-5 py-2 rounded-full font-extrabold text-lg sm:text-xl shadow">PLAY! ▶</span>
+          </button>
+        </div>
+
+        <!-- Toddler Instructions -->
+        <div class="mt-6 bg-white/20 backdrop-blur-md px-6 py-3 rounded-2xl text-center max-w-md border border-white/30">
+          <p class="text-sm sm:text-base font-medium text-white">
+            🎮 <b>Controls:</b> Tap big buttons on screen OR press <span class="bg-yellow-400 text-yellow-950 px-2 py-0.5 rounded font-bold">SPACEBAR</span> to play!
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- IN-GAME TOUCH CONTROL OVERLAY (Giant Buttons for Ages 3-5) -->
+    <footer id="gameControls" class="hidden w-full max-w-4xl p-3 sm:p-4 z-30 flex items-center justify-between gap-3 pointer-events-auto">
+      <!-- Aim Left Button -->
+      <button id="btnLeft" class="bg-blue-500 hover:bg-blue-400 active:bg-blue-600 text-white font-extrabold text-3xl sm:text-5xl p-4 sm:p-6 rounded-3xl btn-super flex-1 flex items-center justify-center border-4 border-white">
+        ⬅️
+      </button>
+
+      <!-- Giant Main Action Button (Kick / Throw / Shoot) -->
+      <button id="btnAction" class="bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-white font-extrabold text-2xl sm:text-4xl py-5 sm:py-7 px-6 sm:px-10 rounded-3xl btn-super flex-[2.5] flex items-center justify-center gap-2 border-4 border-white animate-pulse-grow">
+        <span id="actionIcon" class="text-3xl sm:text-5xl">⚽</span>
+        <span id="actionText">KICK!</span>
+      </button>
+
+      <!-- Aim Right Button -->
+      <button id="btnRight" class="bg-blue-500 hover:bg-blue-400 active:bg-blue-600 text-white font-extrabold text-3xl sm:text-5xl p-4 sm:p-6 rounded-3xl btn-super flex-1 flex items-center justify-center border-4 border-white">
+        ➡️
+      </button>
+    </footer>
+
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    /* ===================================================================
+       1. SOUND ENGINE (Synthesized Web Audio API - Safe & Zero Dependencies)
+       =================================================================== */
+    class SoundEngine {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.bgMusicPlaying = false;
+        this.musicTimer = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          this.ctx = new AudioContext();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      toggleMute() {
+        this.muted = !this.muted;
+        if (this.muted) {
+          this.stopBgMusic();
+        } else {
+          this.startBgMusic();
+        }
+        return this.muted;
+      }
+
+      // Play synthesized pleasant tones
+      playTone(freq, type = 'sine', duration = 0.2, gainVal = 0.1) {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(gainVal, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      }
+
+      playBounce() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(280, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(80, this.ctx.currentTime + 0.15);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.15);
+        } catch(e) {}
+      }
+
+      playKick() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(180, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + 0.2);
+        } catch(e) {}
+      }
+
+      playWhistle() {
+        if (this.muted || !this.ctx) return;
+        this.playTone(1800, 'sine', 0.25, 0.15);
+        setTimeout(() => this.playTone(2200, 'sine', 0.25, 0.15), 60);
+      }
+
+      playGoalHorn() {
+        if (this.muted || !this.ctx) return;
+        const freqs = [174.61, 220, 261.63]; // F chord
+        freqs.forEach(f => this.playTone(f, 'sawtooth', 0.6, 0.12));
+      }
+
+      playStarSound() {
+        if (this.muted || !this.ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C E G C
+        notes.forEach((freq, idx) => {
+          setTimeout(() => this.playTone(freq, 'sine', 0.2, 0.15), idx * 70);
+        });
+      }
+
+      playSwish() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const bufferSize = this.ctx.sampleRate * 0.2;
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = this.ctx.createBufferSource();
+          noise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1000, this.ctx.currentTime);
+          filter.frequency.linearRampToValueAtTime(300, this.ctx.currentTime + 0.2);
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.2);
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          noise.start();
+        } catch(e) {}
+      }
+
+      startBgMusic() {
+        if (this.bgMusicPlaying || this.muted) return;
+        this.bgMusicPlaying = true;
+        let noteIdx = 0;
+        // Simple cheerful nursery-style melody (C Major)
+        const melody = [
+          261.63, 329.63, 392.00, 523.25, 392.00, 329.63,
+          293.66, 349.23, 440.00, 349.23, 293.66,
+          261.63, 329.63, 392.00, 523.25, 440.00, 392.00
+        ];
+
+        this.musicTimer = setInterval(() => {
+          if (!this.muted && this.ctx && this.bgMusicPlaying) {
+            const freq = melody[noteIdx % melody.length];
+            this.playTone(freq, 'sine', 0.3, 0.03);
+            noteIdx++;
+          }
+        }, 320);
+      }
+
+      stopBgMusic() {
+        this.bgMusicPlaying = false;
+        if (this.musicTimer) {
+          clearInterval(this.musicTimer);
+          this.musicTimer = null;
+        }
+      }
+    }
+
+    const sound = new SoundEngine();
+
+
+    /* ===================================================================
+       2. GLOBAL APP & CANVAS SETUP
+       =================================================================== */
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+
+    const homeMenu = document.getElementById('homeMenu');
+    const homeBtn = document.getElementById('homeBtn');
+    const soundBtn = document.getElementById('soundBtn');
+    const soundIcon = document.getElementById('soundIcon');
+    const soundLabel = document.getElementById('soundLabel');
+    const gameControls = document.getElementById('gameControls');
+    const starCounterDisplay = document.getElementById('starCounter');
+    const activeGameText = document.getElementById('activeGameText');
+    const actionIcon = document.getElementById('actionIcon');
+    const actionText = document.getElementById('actionText');
+    const btnAction = document.getElementById('btnAction');
+    const btnLeft = document.getElementById('btnLeft');
+    const btnRight = document.getElementById('btnRight');
+
+    let currentMode = 'MENU'; // MENU, SOCCER, FOOTBALL, BASKETBALL
+    let totalStars = 0;
+    let particles = [];
+    let celebrationBanner = { text: '', timer: 0, scale: 1 };
+
+    // Canvas Responsive Resizing
+    function resizeCanvas() {
+      const parent = canvas.parentElement;
+      const rect = parent.getBoundingClientRect();
+      canvas.width = Math.min(rect.width - 16, 960);
+      canvas.height = Math.min(rect.height - 16, 640);
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+
+    /* ===================================================================
+       3. PARTICLE & CELEBRATION EFFECTS (Confetti & Stars)
+       =================================================================== */
+    function createCelebration(text = 'SUPER STAR!') {
+      celebrationBanner = { text: text, timer: 120, scale: 0.1 };
+      sound.playStarSound();
+      sound.playGoalHorn();
+
+      // Add confetti
+      const colors = ['#facc15', '#38bdf8', '#4ade80', '#f43f5e', '#a855f7', '#fb923c'];
+      for (let i = 0; i < 70; i++) {
+        particles.push({
+          x: canvas.width / 2,
+          y: canvas.height / 2,
+          vx: (Math.random() - 0.5) * 16,
+          vy: (Math.random() - 0.7) * 16,
+          size: Math.random() * 12 + 6,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * Math.PI * 2,
+          vRot: (Math.random() - 0.5) * 0.2,
+          gravity: 0.35,
+          life: 100 + Math.random() * 40,
+          type: Math.random() > 0.4 ? 'star' : 'rect'
+        });
+      }
+      totalStars += 10;
+      starCounterDisplay.innerText = totalStars;
+    }
+
+    function updateAndDrawParticles() {
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += p.gravity;
+        p.rotation += p.vRot;
+        p.life--;
+
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rotation);
+        ctx.fillStyle = p.color;
+
+        if (p.type === 'star') {
+          // Draw star shape
+          ctx.beginPath();
+          for (let s = 0; s < 5; s++) {
+            ctx.lineTo(Math.cos((18 + s * 72) * Math.PI / 180) * p.size, -Math.sin((18 + s * 72) * Math.PI / 180) * p.size);
+            ctx.lineTo(Math.cos((54 + s * 72) * Math.PI / 180) * (p.size / 2), -Math.sin((54 + s * 72) * Math.PI / 180) * (p.size / 2));
+          }
+          ctx.closePath();
+          ctx.fill();
+        } else {
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        }
+        ctx.restore();
+
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
+      // Draw Celebration Banner Popup
+      if (celebrationBanner.timer > 0) {
+        celebrationBanner.timer--;
+        if (celebrationBanner.scale < 1) celebrationBanner.scale += 0.1;
+
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 3);
+        ctx.scale(celebrationBanner.scale, celebrationBanner.scale);
+
+        // Banner Background Box
+        ctx.fillStyle = '#facc15';
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 6;
+        const boxWidth = Math.min(canvas.width * 0.8, 500);
+        ctx.beginPath();
+        ctx.roundRect(-boxWidth / 2, -45, boxWidth, 90, 25);
+        ctx.fill();
+        ctx.stroke();
+
+        // Banner Text
+        ctx.fillStyle = '#713f12';
+        ctx.font = '900 36px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(celebrationBanner.text, 0, 0);
+        ctx.restore();
+      }
+    }
+
+
+    /* ===================================================================
+       4. MINI-GAME 1: SOCCER GOAL STRIKER ⚽
+       =================================================================== */
+    const soccerGame = {
+      ball: { x: 0, y: 0, radius: 24, vx: 0, vy: 0, state: 'ready' },
+      aimAngle: 0,
+      aimDirection: 1,
+      goalie: { x: 0, y: 0, width: 80, height: 70, dir: 1, speed: 2.5 },
+      playerX: 0,
+
+      reset() {
+        this.playerX = canvas.width / 2;
+        this.ball.x = this.playerX;
+        this.ball.y = canvas.height - 90;
+        this.ball.vx = 0;
+        this.ball.vy = 0;
+        this.ball.state = 'ready';
+        this.aimAngle = -Math.PI / 2;
+        this.goalie.x = canvas.width / 2;
+        this.goalie.y = 140;
+      },
+
+      moveLeft() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.max(120, this.playerX - 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      moveRight() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.min(canvas.width - 120, this.playerX + 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      action() {
+        if (this.ball.state === 'ready') {
+          sound.playKick();
+          this.ball.state = 'moving';
+          const speed = 14;
+          this.ball.vx = Math.cos(this.aimAngle) * speed;
+          this.ball.vy = Math.sin(this.aimAngle) * speed;
+        }
+      },
+
+      update() {
+        // Goalie Gentle Swaying
+        this.goalie.x += this.goalie.dir * this.goalie.speed;
+        const goalLeft = canvas.width * 0.2;
+        const goalRight = canvas.width * 0.8;
+        if (this.goalie.x < goalLeft + 60 || this.goalie.x > goalRight - 60) {
+          this.goalie.dir *= -1;
+        }
+
+        // Aim Indicator Oscillating
+        if (this.ball.state === 'ready') {
+          this.aimAngle += 0.03 * this.aimDirection;
+          if (this.aimAngle > -Math.PI / 4) this.aimDirection = -1;
+          if (this.aimAngle < -3 * Math.PI / 4) this.aimDirection = 1;
+        }
+
+        // Ball Physics
+        if (this.ball.state === 'moving') {
+          this.ball.x += this.ball.vx;
+          this.ball.y += this.ball.vy;
+          this.ball.radius = Math.max(16, this.ball.radius - 0.15); // Perspective shrink
+
+          // Check Goalie Soft Interaction (Goalie dive attempt, low difficulty for kids!)
+          const distToGoalie = Math.hypot(this.ball.x - this.goalie.x, this.ball.y - this.goalie.y);
+          if (distToGoalie < 45 && Math.random() < 0.2) {
+            // Gentle deflection, but ball still curves in for fun!
+            this.ball.vx = -this.ball.vx * 0.5;
+            sound.playBounce();
+          }
+
+          // Check Goal Scoring (Top netting area)
+          if (this.ball.y < 130) {
+            if (this.ball.x > goalLeft && this.ball.x < goalRight) {
+              createCelebration('GOAL! ⚽ SUPER KICK!');
+            } else {
+              sound.playWhistle(); // Missed wide, reset safely
+            }
+            setTimeout(() => this.reset(), 1500);
+            this.ball.state = 'scored';
+          }
+        }
+      },
+
+      draw() {
+        // Draw Field
+        ctx.fillStyle = '#4ade80'; // Bright Grass Green
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Field Lines
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 6;
+        ctx.strokeRect(40, 40, canvas.width - 80, canvas.height - 80);
+
+        // Soccer Goal Net (Top)
+        const goalLeft = canvas.width * 0.2;
+        const goalRight = canvas.width * 0.8;
+        const goalTop = 60;
+        const goalBottom = 130;
+
+        ctx.fillStyle = 'rgba(255,255,255,0.3)';
+        ctx.fillRect(goalLeft, goalTop, goalRight - goalLeft, goalBottom - goalTop);
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 8;
+        ctx.strokeRect(goalLeft, goalTop, goalRight - goalLeft, goalBottom - goalTop);
+
+        // Goal Net Mesh Lines
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        for (let x = goalLeft; x <= goalRight; x += 25) {
+          ctx.beginPath();
+          ctx.moveTo(x, goalTop);
+          ctx.lineTo(x, goalBottom);
+          ctx.stroke();
+        }
+
+        // Draw Goalie (Friendly Cute Bear Goalie)
+        ctx.save();
+        ctx.translate(this.goalie.x, this.goalie.y);
+        // Bear Body
+        ctx.fillStyle = '#fb923c';
+        ctx.beginPath();
+        ctx.arc(0, 0, 30, 0, Math.PI * 2);
+        ctx.fill();
+        // Bear Ears
+        ctx.fillStyle = '#ea580c';
+        ctx.beginPath();
+        ctx.arc(-22, -22, 10, 0, Math.PI * 2);
+        ctx.arc(22, -22, 10, 0, Math.PI * 2);
+        ctx.fill();
+        // Goalie Gloves
+        ctx.fillStyle = '#38bdf8';
+        ctx.beginPath();
+        ctx.arc(-36, 0, 12, 0, Math.PI * 2);
+        ctx.arc(36, 0, 12, 0, Math.PI * 2);
+        ctx.fill();
+        // Face Eyes & Smile
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-8, -5, 4, 0, Math.PI * 2);
+        ctx.arc(8, -5, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, 5, 8, 0, Math.PI);
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw Player Shoes/Shadow at bottom
+        ctx.fillStyle = 'rgba(0,0,0,0.15)';
+        ctx.beginPath();
+        ctx.ellipse(this.playerX, canvas.height - 60, 40, 12, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw Aim Arrow
+        if (this.ball.state === 'ready') {
+          ctx.save();
+          ctx.translate(this.ball.x, this.ball.y);
+          ctx.rotate(this.aimAngle);
+          ctx.strokeStyle = '#facc15';
+          ctx.fillStyle = '#facc15';
+          ctx.lineWidth = 8;
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(80, 0);
+          ctx.stroke();
+          // Arrow Head
+          ctx.beginPath();
+          ctx.moveTo(80, -12);
+          ctx.lineTo(100, 0);
+          ctx.lineTo(80, 12);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Draw Soccer Ball with Smiling Face
+        ctx.save();
+        ctx.translate(this.ball.x, this.ball.y);
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.lineWidth = 3;
+        ctx.strokeStyle = '#000000';
+        ctx.stroke();
+
+        // Soccer Pentagons
+        ctx.fillStyle = '#000000';
+        for (let i = 0; i < 3; i++) {
+          const a = (i * 120) * Math.PI / 180;
+          ctx.beginPath();
+          ctx.arc(Math.cos(a) * 12, Math.sin(a) * 12, 5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        // Cute Eyes
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-5, -3, 2.5, 0, Math.PI * 2);
+        ctx.arc(5, -3, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    };
+
+
+    /* ===================================================================
+       5. MINI-GAME 2: FOOTBALL TOUCHDOWN TOSS 🏈
+       =================================================================== */
+    const footballGame = {
+      ball: { x: 0, y: 0, vx: 0, vy: 0, state: 'ready', arcProgress: 0 },
+      targetRing: { x: 0, y: 0, radius: 45, dir: 1, speed: 2 },
+      playerX: 0,
+      throwPower: 0,
+      powerDir: 1,
+
+      reset() {
+        this.playerX = canvas.width / 2;
+        this.ball.x = this.playerX;
+        this.ball.y = canvas.height - 90;
+        this.ball.state = 'ready';
+        this.ball.arcProgress = 0;
+        this.targetRing.x = canvas.width / 2;
+        this.targetRing.y = 150;
+        this.throwPower = 0.5;
+      },
+
+      moveLeft() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.max(140, this.playerX - 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      moveRight() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.min(canvas.width - 140, this.playerX + 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      action() {
+        if (this.ball.state === 'ready') {
+          sound.playKick();
+          this.ball.state = 'flying';
+          this.ball.arcProgress = 0;
+          this.ball.startX = this.ball.x;
+          this.ball.startY = this.ball.y;
+          this.ball.targetX = this.targetRing.x;
+          this.ball.targetY = this.targetRing.y;
+        }
+      },
+
+      update() {
+        // Target Ring Swaying
+        this.targetRing.x += this.targetRing.dir * this.targetRing.speed;
+        if (this.targetRing.x < 150 || this.targetRing.x > canvas.width - 150) {
+          this.targetRing.dir *= -1;
+        }
+
+        // Power Pulsing
+        if (this.ball.state === 'ready') {
+          this.throwPower += 0.02 * this.powerDir;
+          if (this.throwPower > 1) this.powerDir = -1;
+          if (this.throwPower < 0.2) this.powerDir = 1;
+        }
+
+        // Flight Physics (Bezier Arc towards target)
+        if (this.ball.state === 'flying') {
+          this.ball.arcProgress += 0.03;
+          const t = this.ball.arcProgress;
+
+          // Parabolic path
+          this.ball.x = (1 - t) * this.ball.startX + t * this.ball.targetX;
+          const directY = (1 - t) * this.ball.startY + t * this.ball.targetY;
+          const arcHeight = 120 * Math.sin(t * Math.PI);
+          this.ball.y = directY - arcHeight;
+
+          if (t >= 1) {
+            // Check Hit target
+            const dist = Math.hypot(this.ball.x - this.targetRing.x, this.ball.y - this.targetRing.y);
+            if (dist < this.targetRing.radius + 20) {
+              createCelebration('TOUCHDOWN! 🏈 AMAZING TOSS!');
+            } else {
+              sound.playWhistle();
+            }
+            this.ball.state = 'done';
+            setTimeout(() => this.reset(), 1500);
+          }
+        }
+      },
+
+      draw() {
+        // Draw Field (American Football Endzone)
+        ctx.fillStyle = '#15803d';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Endzone Top Stripe
+        ctx.fillStyle = '#b91c1c';
+        ctx.fillRect(0, 0, canvas.width, 100);
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '900 28px Fredoka, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('⭐ TOUCHDOWN ZONE ⭐', canvas.width / 2, 60);
+
+        // Yard lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+        ctx.lineWidth = 4;
+        for (let y = 160; y < canvas.height; y += 80) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+        }
+
+        // Target Floating Ring (Glowing Star Ring)
+        ctx.save();
+        ctx.translate(this.targetRing.x, this.targetRing.y);
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = '#facc15';
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.25)';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.targetRing.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Star on Target
+        ctx.fillStyle = '#facc15';
+        ctx.font = '24px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('⭐', 0, 0);
+        ctx.restore();
+
+        // Trajectory Preview line
+        if (this.ball.state === 'ready') {
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+          ctx.lineWidth = 4;
+          ctx.setLineDash([8, 8]);
+          ctx.beginPath();
+          ctx.moveTo(this.ball.x, this.ball.y);
+          ctx.quadraticCurveTo(
+            (this.ball.x + this.targetRing.x) / 2,
+            this.targetRing.y - 100,
+            this.targetRing.x,
+            this.targetRing.y
+          );
+          ctx.stroke();
+          ctx.setLineDash([]);
+        }
+
+        // Draw Football
+        ctx.save();
+        ctx.translate(this.ball.x, this.ball.y);
+        if (this.ball.state === 'flying') {
+          ctx.rotate(this.ball.arcProgress * Math.PI * 4); // Spiral spinning!
+        } else {
+          ctx.rotate(-Math.PI / 4);
+        }
+
+        // Football Ellipse Body
+        ctx.fillStyle = '#7c2d12';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 26, 16, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Football Laces
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-10, 0);
+        ctx.lineTo(10, 0);
+        ctx.moveTo(-4, -4); ctx.lineTo(-4, 4);
+        ctx.moveTo(0, -4);  ctx.lineTo(0, 4);
+        ctx.moveTo(4, -4);  ctx.lineTo(4, 4);
+        ctx.stroke();
+        ctx.restore();
+      }
+    };
+
+
+    /* ===================================================================
+       6. MINI-GAME 3: BASKETBALL HOOPS 🏀
+       =================================================================== */
+    const basketballGame = {
+      ball: { x: 0, y: 0, vx: 0, vy: 0, radius: 26, state: 'ready' },
+      hoop: { x: 0, y: 0, radius: 42, dir: 1, speed: 1.8 },
+      playerX: 0,
+
+      reset() {
+        this.playerX = canvas.width / 2;
+        this.ball.x = this.playerX;
+        this.ball.y = canvas.height - 90;
+        this.ball.vx = 0;
+        this.ball.vy = 0;
+        this.ball.state = 'ready';
+        this.hoop.x = canvas.width * 0.7;
+        this.hoop.y = 160;
+      },
+
+      moveLeft() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.max(120, this.playerX - 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      moveRight() {
+        if (this.ball.state === 'ready') {
+          this.playerX = Math.min(canvas.width - 120, this.playerX + 25);
+          this.ball.x = this.playerX;
+        }
+      },
+
+      action() {
+        if (this.ball.state === 'ready') {
+          sound.playKick();
+          this.ball.state = 'flying';
+          // Calculate high arcing trajectory toward hoop
+          const dx = this.hoop.x - this.ball.x;
+          const dy = this.hoop.y - this.ball.y;
+          this.ball.vx = dx / 40;
+          this.ball.vy = -15; // Upward launch burst
+        }
+      },
+
+      update() {
+        // Hoop sways side to side gently
+        this.hoop.x += this.hoop.dir * this.hoop.speed;
+        if (this.hoop.x < canvas.width * 0.3 || this.hoop.x > canvas.width * 0.8) {
+          this.hoop.dir *= -1;
+        }
+
+        if (this.ball.state === 'flying') {
+          this.ball.x += this.ball.vx;
+          this.ball.y += this.ball.vy;
+          this.ball.vy += 0.45; // Gravity
+
+          // Check Rim / Swish Collision
+          const distToHoop = Math.hypot(this.ball.x - this.hoop.x, this.ball.y - this.hoop.y);
+          if (distToHoop < 35 && this.ball.vy > 0) {
+            sound.playSwish();
+            createCelebration('SWISH! 🏀 AWESOME HOOP!');
+            this.ball.state = 'scored';
+            setTimeout(() => this.reset(), 1500);
+          } else if (this.ball.y > canvas.height + 40) {
+            sound.playWhistle();
+            this.ball.state = 'missed';
+            setTimeout(() => this.reset(), 1000);
+          }
+        }
+      },
+
+      draw() {
+        // Draw Basketball Court Ground
+        ctx.fillStyle = '#fb923c'; // Warm Wood/Orange Court
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Court Lines
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 5;
+        // Key line
+        ctx.strokeRect(canvas.width * 0.2, 100, canvas.width * 0.6, canvas.height - 100);
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height - 100, 100, Math.PI, 0);
+        ctx.stroke();
+
+        // Draw Basketball Backboard & Hoop Net
+        ctx.save();
+        ctx.translate(this.hoop.x, this.hoop.y);
+
+        // Backboard
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 6;
+        ctx.fillRect(-50, -60, 100, 50);
+        ctx.strokeRect(-50, -60, 100, 50);
+        ctx.strokeRect(-20, -40, 40, 30);
+
+        // Rim
+        ctx.strokeStyle = '#ea580c';
+        ctx.lineWidth = 8;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, this.hoop.radius, 12, 0, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Net (White Webbing)
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-this.hoop.radius + 5, 0);
+        ctx.lineTo(-20, 45);
+        ctx.lineTo(20, 45);
+        ctx.lineTo(this.hoop.radius - 5, 0);
+        ctx.stroke();
+        ctx.restore();
+
+        // Draw Basketball
+        ctx.save();
+        ctx.translate(this.ball.x, this.ball.y);
+        ctx.fillStyle = '#ea580c';
+        ctx.beginPath();
+        ctx.arc(0, 0, this.ball.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#000000';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Basketball Black Lines
+        ctx.beginPath();
+        ctx.moveTo(-this.ball.radius, 0); ctx.lineTo(this.ball.radius, 0);
+        ctx.moveTo(0, -this.ball.radius); ctx.lineTo(0, this.ball.radius);
+        ctx.stroke();
+
+        // Cute Eyes
+        ctx.fillStyle = '#000000';
+        ctx.beginPath();
+        ctx.arc(-7, -4, 3, 0, Math.PI * 2);
+        ctx.arc(7, -4, 3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    };
+
+
+    /* ===================================================================
+       7. MAIN GAME LOOP & CONTROLLER
+       =================================================================== */
+    function startGame(mode) {
+      sound.init();
+      sound.startBgMusic();
+      currentMode = mode.toUpperCase();
+
+      homeMenu.classList.add('hidden');
+      gameControls.classList.remove('hidden');
+      homeBtn.classList.remove('hidden');
+
+      if (currentMode === 'SOCCER') {
+        activeGameText.innerText = 'Soccer Striker! ⚽';
+        actionIcon.innerText = '⚽';
+        actionText.innerText = 'KICK!';
+        soccerGame.reset();
+      } else if (currentMode === 'FOOTBALL') {
+        activeGameText.innerText = 'Touchdown Toss! 🏈';
+        actionIcon.innerText = '🏈';
+        actionText.innerText = 'THROW!';
+        footballGame.reset();
+      } else if (currentMode === 'BASKETBALL') {
+        activeGameText.innerText = 'Basketball Hoops! 🏀';
+        actionIcon.innerText = '🏀';
+        actionText.innerText = 'SHOOT!';
+        basketballGame.reset();
+      }
+    }
+
+    function returnToMenu() {
+      currentMode = 'MENU';
+      homeMenu.classList.remove('hidden');
+      gameControls.classList.add('hidden');
+      homeBtn.classList.add('hidden');
+      activeGameText.innerText = 'Super Sports Party! 🌟';
+    }
+
+    // Trigger Current Action (Kick / Throw / Shoot)
+    function triggerAction() {
+      if (currentMode === 'SOCCER') soccerGame.action();
+      else if (currentMode === 'FOOTBALL') footballGame.action();
+      else if (currentMode === 'BASKETBALL') basketballGame.action();
+    }
+
+    function triggerLeft() {
+      if (currentMode === 'SOCCER') soccerGame.moveLeft();
+      else if (currentMode === 'FOOTBALL') footballGame.moveLeft();
+      else if (currentMode === 'BASKETBALL') basketballGame.moveLeft();
+    }
+
+    function triggerRight() {
+      if (currentMode === 'SOCCER') soccerGame.moveRight();
+      else if (currentMode === 'FOOTBALL') footballGame.moveRight();
+      else if (currentMode === 'BASKETBALL') basketballGame.moveRight();
+    }
+
+    // Event Listeners for Touch Controls
+    btnAction.addEventListener('click', triggerAction);
+    btnLeft.addEventListener('click', triggerLeft);
+    btnRight.addEventListener('click', triggerRight);
+    homeBtn.addEventListener('click', returnToMenu);
+
+    soundBtn.addEventListener('click', () => {
+      sound.init();
+      const isMuted = sound.toggleMute();
+      soundIcon.innerText = isMuted ? '🔇' : '🔊';
+      soundLabel.innerText = isMuted ? 'Music OFF' : 'Music ON';
+    });
+
+    // Keyboard Listeners (Spacebar / Arrows for Desktop Play)
+    window.addEventListener('keydown', (e) => {
+      sound.init();
+      if (e.code === 'Space' || e.code === 'Enter' || e.code === 'ArrowUp') {
+        e.preventDefault();
+        triggerAction();
+      } else if (e.code === 'ArrowLeft') {
+        e.preventDefault();
+        triggerLeft();
+      } else if (e.code === 'ArrowRight') {
+        e.preventDefault();
+        triggerRight();
+      } else if (e.code === 'Escape') {
+        returnToMenu();
+      }
+    });
+
+    // Master Animation Render Loop
+    function gameLoop() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (currentMode === 'SOCCER') {
+        soccerGame.update();
+        soccerGame.draw();
+      } else if (currentMode === 'FOOTBALL') {
+        footballGame.update();
+        footballGame.draw();
+      } else if (currentMode === 'BASKETBALL') {
+        basketballGame.update();
+        basketballGame.draw();
+      } else {
+        // Menu Background Animation
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // Draw global particle effects & goal celebrations over the canvas
+      updateAndDrawParticles();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.onload = () => {
+      gameLoop();
+    };
+  </script>
+</body>
+</html>
