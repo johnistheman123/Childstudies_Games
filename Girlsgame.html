@@ -1,0 +1,1540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Darling Doll Studio ✨ Custom Chibi Dress Up</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Fredoka & Quicksand -->
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@500;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Fredoka', 'Quicksand', cursive, sans-serif;
+      touch-action: manipulation;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    /* Animations */
+    @keyframes float-soft {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .animate-float-soft {
+      animation: float-soft 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 5px rgba(244, 63, 94, 0.4)); }
+      50% { transform: scale(1.04); filter: drop-shadow(0 0 12px rgba(244, 63, 94, 0.7)); }
+    }
+    .animate-pulse-glow {
+      animation: pulse-glow 2.5s infinite ease-in-out;
+    }
+
+    @keyframes spin-sparkle {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.25); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    .animate-sparkle-spin {
+      animation: spin-sparkle 6s infinite linear;
+    }
+
+    /* Custom Kid Buttons */
+    .btn-darling {
+      box-shadow: 0 6px 0 0 rgba(225, 29, 72, 0.25), inset 0 2px 0 0 rgba(255, 255, 255, 0.7);
+      transition: all 0.12s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-darling:active {
+      transform: translateY(4px);
+      box-shadow: 0 2px 0 0 rgba(225, 29, 72, 0.25), inset 0 1px 0 0 rgba(255, 255, 255, 0.7);
+    }
+
+    .btn-cat-active {
+      background: linear-gradient(135deg, #f43f5e, #fb7185) !important;
+      color: #ffffff !important;
+      border-color: #ffe4e6 !important;
+      box-shadow: 0 0 0 3px #f43f5e, 0 6px 12px rgba(244, 63, 94, 0.35) !important;
+      transform: scale(1.05);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.4);
+      border-radius: 12px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #fb7185;
+      border-radius: 12px;
+      border: 2px solid #fff1f2;
+    }
+
+    canvas {
+      touch-action: none;
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-rose-200 via-pink-200 to-purple-200 min-h-screen text-slate-800 flex flex-col justify-between overflow-x-hidden">
+
+  <!-- TOP HEADER / BRANDING HUD -->
+  <header class="w-full p-2 sm:p-3 bg-white/70 backdrop-blur-md border-b-4 border-white/80 flex flex-wrap justify-between items-center gap-2 z-30 sticky top-0 shadow-md">
+    <!-- Game Logo & Title -->
+    <div class="flex items-center gap-2">
+      <span class="text-3xl sm:text-4xl animate-sparkle-spin">🎀</span>
+      <div>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-rose-600 drop-shadow-sm tracking-wide flex items-center gap-1.5">
+          Darling Doll Studio <span class="text-xs bg-rose-500 text-white px-2 py-0.5 rounded-full uppercase tracking-wider font-bold">School Edition ✨</span>
+        </h1>
+        <p class="text-xs font-semibold text-purple-900 hidden sm:block">
+          Style your ultimate kawaii chibi avatar! 👗💄🌸
+        </p>
+      </div>
+    </div>
+
+    <!-- Actions: Sound, Randomizer, Photo Studio, Reset -->
+    <div class="flex items-center gap-1.5 sm:gap-2 ml-auto">
+      <!-- Sound Toggle -->
+      <button id="soundBtn" onclick="toggleSound()" class="bg-purple-100 hover:bg-purple-200 text-purple-900 font-bold px-3 py-2 rounded-2xl btn-darling flex items-center gap-1 text-sm sm:text-base border-2 border-white">
+        <span id="soundIcon">🔊</span>
+        <span id="soundLabel" class="text-xs font-bold hidden md:inline">Sound ON</span>
+      </button>
+
+      <!-- Surprise Outfit -->
+      <button id="randomizeBtn" onclick="randomizeOutfit()" class="bg-gradient-to-r from-amber-300 to-rose-400 hover:from-amber-200 hover:to-rose-300 text-amber-950 font-extrabold px-3 py-2 sm:px-4 sm:py-2 rounded-2xl btn-darling flex items-center gap-1.5 text-sm sm:text-base border-2 border-white animate-pulse-glow">
+        <span>🎲</span>
+        <span class="text-xs sm:text-sm font-bold hidden sm:inline">Surprise Me!</span>
+      </button>
+
+      <!-- Photo Studio -->
+      <button id="photoBtn" onclick="openPhotoModal()" class="bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-400 hover:to-pink-400 text-white font-extrabold px-3 py-2 sm:px-4 sm:py-2 rounded-2xl btn-darling flex items-center gap-1.5 text-sm sm:text-base border-2 border-white">
+        <span>📷</span>
+        <span class="text-xs sm:text-sm font-bold hidden sm:inline">Photo Studio</span>
+      </button>
+
+      <!-- Reset -->
+      <button id="resetBtn" onclick="resetDoll()" title="Reset Doll" class="bg-sky-100 hover:bg-sky-200 text-sky-900 font-bold p-2 rounded-2xl btn-darling text-base sm:text-lg border-2 border-white">
+        🔄
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN DRESS UP STUDIO -->
+  <main class="flex-1 w-full max-w-7xl mx-auto p-2 sm:p-4 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 items-start">
+
+    <!-- LEFT COLUMN: SCENE SELECTOR & DOLL DISPLAY CANVAS -->
+    <section class="lg:col-span-5 xl:col-span-5 flex flex-col items-center justify-center relative w-full">
+
+      <!-- Scene / Location Pills -->
+      <div class="w-full mb-2 flex items-center justify-center gap-1 sm:gap-2 overflow-x-auto py-1 px-2 bg-white/40 backdrop-blur-sm rounded-2xl border-2 border-white/70 shadow-sm">
+        <span class="text-xs font-black text-rose-900 uppercase tracking-wider hidden sm:inline">Scene:</span>
+        <button onclick="setScene('classroom')" class="px-2.5 py-1 rounded-xl bg-pink-100 border-2 border-pink-400 font-bold text-xs text-pink-900 shadow-sm hover:scale-105 transition">🏫 Class</button>
+        <button onclick="setScene('park')" class="px-2.5 py-1 rounded-xl bg-emerald-100 border-2 border-emerald-400 font-bold text-xs text-emerald-900 shadow-sm hover:scale-105 transition">🌸 Park</button>
+        <button onclick="setScene('bedroom')" class="px-2.5 py-1 rounded-xl bg-indigo-100 border-2 border-indigo-400 font-bold text-xs text-indigo-900 shadow-sm hover:scale-105 transition">🛏️ Room</button>
+        <button onclick="setScene('castle')" class="px-2.5 py-1 rounded-xl bg-amber-100 border-2 border-amber-400 font-bold text-xs text-amber-900 shadow-sm hover:scale-105 transition">🏰 Castle</button>
+        <button onclick="setScene('night')" class="px-2.5 py-1 rounded-xl bg-purple-100 border-2 border-purple-400 font-bold text-xs text-purple-900 shadow-sm hover:scale-105 transition">🌙 Night</button>
+      </div>
+
+      <!-- Main Interactive Doll Canvas Frame -->
+      <div class="relative w-full max-w-md aspect-[3/4] bg-white rounded-3xl p-2.5 border-4 sm:border-8 border-white/90 shadow-2xl overflow-hidden flex items-center justify-center">
+        <!-- Canvas -->
+        <canvas id="dollCanvas" class="w-full h-full rounded-2xl cursor-pointer"></canvas>
+
+        <!-- Sparkle Hint Badge -->
+        <div class="absolute top-4 right-4 bg-white/85 backdrop-blur-md px-3 py-1 rounded-full border border-pink-300 text-xs font-extrabold text-rose-600 flex items-center gap-1 shadow">
+          <span>✨ Tap doll for sparkles!</span>
+        </div>
+      </div>
+
+      <!-- Dialog Bubble Quick Customizer -->
+      <div class="mt-2 w-full max-w-md bg-white/50 backdrop-blur-sm p-2 rounded-2xl border-2 border-white/80 flex items-center gap-2">
+        <span class="text-xs font-extrabold text-purple-900 whitespace-nowrap">💬 Speech:</span>
+        <select id="bubbleSelect" onchange="setSpeechBubble(this.value)" class="flex-1 bg-white border-2 border-pink-300 rounded-xl px-2 py-1 text-xs font-bold text-rose-800 outline-none focus:border-rose-500">
+          <option value="Kawaii! ✨">Kawaii! ✨</option>
+          <option value="School Day! 📚">School Day! 📚</option>
+          <option value="Best Friends! 💕">Best Friends! 💕</option>
+          <option value="Sparkle Time! 👑">Sparkle Time! 👑</option>
+          <option value="Super Cute! 🌸">Super Cute! 🌸</option>
+          <option value="none">No Bubble</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- RIGHT COLUMN: CATEGORY TABS & WARDROBE PALETTE -->
+    <section class="lg:col-span-7 xl:col-span-7 flex flex-col bg-white/70 backdrop-blur-md rounded-3xl p-3 sm:p-4 border-4 border-white/90 shadow-xl h-full min-h-[510px]">
+
+      <!-- Category Navigation Grid -->
+      <div class="grid grid-cols-4 sm:grid-cols-8 gap-1.5 mb-2.5 pb-2 border-b-2 border-pink-200">
+        <button onclick="selectCategory('face')" id="cat-face" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-pink-100 hover:bg-pink-200 text-pink-900 font-extrabold border-2 border-pink-300 transition text-xs btn-cat-active">
+          <span class="text-xl sm:text-2xl">👧</span>
+          <span>Face</span>
+        </button>
+        <button onclick="selectCategory('hair')" id="cat-hair" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-amber-100 hover:bg-amber-200 text-amber-900 font-extrabold border-2 border-amber-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">💇‍♀️</span>
+          <span>Hair</span>
+        </button>
+        <button onclick="selectCategory('outfits')" id="cat-outfits" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-purple-100 hover:bg-purple-200 text-purple-900 font-extrabold border-2 border-purple-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">👗</span>
+          <span>Dresses</span>
+        </button>
+        <button onclick="selectCategory('tops')" id="cat-tops" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-rose-100 hover:bg-rose-200 text-rose-900 font-extrabold border-2 border-rose-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">👚</span>
+          <span>Tops</span>
+        </button>
+        <button onclick="selectCategory('bottoms')" id="cat-bottoms" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-indigo-100 hover:bg-indigo-200 text-indigo-900 font-extrabold border-2 border-indigo-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">👖</span>
+          <span>Skirts</span>
+        </button>
+        <button onclick="selectCategory('shoes')" id="cat-shoes" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-emerald-100 hover:bg-emerald-200 text-emerald-900 font-extrabold border-2 border-emerald-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">👠</span>
+          <span>Shoes</span>
+        </button>
+        <button onclick="selectCategory('acc')" id="cat-acc" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-yellow-100 hover:bg-yellow-200 text-yellow-900 font-extrabold border-2 border-yellow-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">👑</span>
+          <span>Accs</span>
+        </button>
+        <button onclick="selectCategory('pets')" id="cat-pets" class="cat-btn flex flex-col items-center justify-center p-1.5 rounded-2xl bg-teal-100 hover:bg-teal-200 text-teal-900 font-extrabold border-2 border-teal-300 transition text-xs">
+          <span class="text-xl sm:text-2xl">🐱</span>
+          <span>Pets</span>
+        </button>
+      </div>
+
+      <!-- Color Swatch & Customization Sub-Bar -->
+      <div id="subBarContainer" class="mb-2.5 p-2 bg-white/80 rounded-2xl border-2 border-pink-200 flex flex-wrap items-center gap-1.5 min-h-[44px]">
+        <!-- Dynamic color swatches / sub options injected here -->
+      </div>
+
+      <!-- Wardrobe Items Cards Grid -->
+      <div id="itemGrid" class="flex-1 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2.5 overflow-y-auto max-h-[380px] p-1">
+        <!-- Dynamic Item Cards Injected Here -->
+      </div>
+
+    </section>
+  </main>
+
+  <!-- PHOTO STUDIO MODAL SNAPSHOT -->
+  <div id="photoModal" class="fixed inset-0 z-50 bg-black/65 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="bg-gradient-to-b from-rose-100 via-pink-100 to-purple-100 rounded-3xl border-8 border-white p-5 max-w-md w-full text-center shadow-2xl relative animate-float-soft">
+      
+      <div class="text-4xl mb-1">📸✨</div>
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-rose-600 drop-shadow-sm">DARLING LOOK!</h2>
+      <p class="text-purple-900 font-bold text-xs sm:text-sm mt-0.5">
+        🌸 100% KAWAII STYLIST RATING! 🌸
+      </p>
+
+      <!-- Snapshot Preview -->
+      <div class="my-3 relative bg-white p-2 rounded-2xl border-4 border-rose-300 shadow-md mx-auto w-44 sm:w-56 aspect-[3/4]">
+        <img id="snapshotImg" class="w-full h-full object-contain rounded-xl" alt="Doll Snapshot">
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-2 mt-3">
+        <button onclick="downloadSnapshot()" class="bg-emerald-400 hover:bg-emerald-300 text-emerald-950 font-extrabold px-4 py-2.5 rounded-2xl btn-darling text-sm flex items-center gap-1.5 border-2 border-white">
+          ⬇️ Save Picture
+        </button>
+        <button onclick="closePhotoModal()" class="bg-rose-500 hover:bg-rose-400 text-white font-extrabold px-5 py-2.5 rounded-2xl btn-darling text-sm border-2 border-white">
+          ✨ Keep Styling
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT GAME LOGIC -->
+  <script>
+    /* ===================================================================
+       1. STATE MANAGEMENT & DATA DEFINITIONS
+       =================================================================== */
+    const canvas = document.getElementById('dollCanvas');
+    const ctx = canvas.getContext('2d');
+
+    // Web Audio Synthesizer Engine
+    const audio = {
+      ctx: null,
+      muted: false,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      },
+      playPop() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(450, this.ctx.currentTime);
+          osc.frequency.exponentialRampToValueAtTime(900, this.ctx.currentTime + 0.07);
+          gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.07);
+          osc.connect(gain); gain.connect(this.ctx.destination);
+          osc.start(); osc.stop(this.ctx.currentTime + 0.07);
+        } catch(e) {}
+      },
+      playChime() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const freqs = [523.25, 659.25, 783.99, 1046.5];
+          freqs.forEach((f, i) => {
+            setTimeout(() => {
+              const osc = this.ctx.createOscillator();
+              const gain = this.ctx.createGain();
+              osc.type = 'triangle';
+              osc.frequency.setValueAtTime(f, this.ctx.currentTime);
+              gain.gain.setValueAtTime(0.12, this.ctx.currentTime);
+              gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
+              osc.connect(gain); gain.connect(this.ctx.destination);
+              osc.start(); osc.stop(this.ctx.currentTime + 0.22);
+            }, i * 55);
+          });
+        } catch(e) {}
+      },
+      playShutter() {
+        if (this.muted || !this.ctx) return;
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(850, this.ctx.currentTime);
+          osc.frequency.setValueAtTime(250, this.ctx.currentTime + 0.04);
+          gain.gain.setValueAtTime(0.25, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+          osc.connect(gain); gain.connect(this.ctx.destination);
+          osc.start(); osc.stop(this.ctx.currentTime + 0.1);
+        } catch(e) {}
+      }
+    };
+
+    function toggleSound() {
+      audio.init();
+      audio.muted = !audio.muted;
+      document.getElementById('soundIcon').textContent = audio.muted ? '🔇' : '🔊';
+      document.getElementById('soundLabel').textContent = audio.muted ? 'Sound OFF' : 'Sound ON';
+    }
+
+    // Doll Customization State
+    const dollState = {
+      skinTone: '#fce3d3',
+      eyeColor: '#2563eb',
+      eyeShape: 'sparkle_anime',
+      eyebrows: 'cute_arch',
+      mouth: 'happy_smile',
+      blush: 'pink_soft',
+      faceDecor: 'heart_bandage',
+      
+      hairBangs: 'anime_bangs',
+      hairBack: 'twin_pigtails',
+      hairColor: '#facc15',
+      
+      dress: 'school_sailor',
+      top: 'none',
+      bottom: 'none',
+      shoes: 'mary_janes',
+      
+      accHead: 'cat_ears',
+      accGlasses: 'none',
+      accHand: 'boba_tea',
+      accPet: 'kitten',
+      
+      speechBubble: 'Kawaii! ✨',
+      scene: 'classroom'
+    };
+
+    let activeCategory = 'face';
+    let sparkles = [];
+
+    // Color Swatch Palettes
+    const skinTones = [
+      { name: 'Peach Cream', hex: '#fce3d3' },
+      { name: 'Fair Rose', hex: '#fde0dc' },
+      { name: 'Warm Honey', hex: '#f3c193' },
+      { name: 'Soft Cocoa', hex: '#8d533a' },
+      { name: 'Fairy Pink', hex: '#fbcfe8' },
+      { name: 'Pastel Lavender', hex: '#e9d5ff' }
+    ];
+
+    const hairColors = [
+      { name: 'Golden Blonde', hex: '#facc15' },
+      { name: 'Cotton Candy', hex: '#f472b6' },
+      { name: 'Mint Green', hex: '#34d399' },
+      { name: 'Lavender Violet', hex: '#c084fc' },
+      { name: 'Ocean Blue', hex: '#38bdf8' },
+      { name: 'Chocolate Brown', hex: '#78350f' },
+      { name: 'Midnight Black', hex: '#1e293b' }
+    ];
+
+    const eyeColors = [
+      { name: 'Sapphire Blue', hex: '#2563eb' },
+      { name: 'Emerald Green', hex: '#059669' },
+      { name: 'Amethyst Purple', hex: '#9333ea' },
+      { name: 'Ruby Pink', hex: '#e11d48' },
+      { name: 'Warm Amber', hex: '#d97706' },
+      { name: 'Obsidian Black', hex: '#1e293b' }
+    ];
+
+    // Wardrobe & Customization Registry
+    const wardrobe = {
+      face: [
+        { id: 'sparkle_anime', type: 'eyeShape', name: 'Sparkle Anime Eyes', icon: '👀' },
+        { id: 'cat_eyes', type: 'eyeShape', name: 'Cute Cat Eyes', icon: '🐱' },
+        { id: 'wink_eye', type: 'eyeShape', name: 'Playful Wink', icon: '😉' },
+        
+        { id: 'happy_smile', type: 'mouth', name: 'Happy Smile', icon: '😊' },
+        { id: 'cat_mouth', type: 'mouth', name: 'Nya Cat Mouth', icon: '3️⃣' },
+        { id: 'open_happy', type: 'mouth', name: 'Open Laugh', icon: '😃' },
+        
+        { id: 'heart_bandage', type: 'faceDecor', name: 'Heart Band-Aid', icon: '🩹' },
+        { id: 'cheek_stars', type: 'faceDecor', name: 'Cheek Stars', icon: '⭐' },
+        { id: 'none_decor', type: 'faceDecor', name: 'No Decor', icon: '🚫' }
+      ],
+      hair: [
+        { id: 'twin_pigtails', type: 'back', name: 'Twin Pigtails', icon: '👧' },
+        { id: 'long_waves', type: 'back', name: 'Long Waves', icon: '👸' },
+        { id: 'crown_braid', type: 'back', name: 'Crown Braid', icon: '👱‍♀️' },
+        { id: 'cute_bob', type: 'back', name: 'Cute Bob Cut', icon: '💇‍♀️' },
+        { id: 'afro_puffs', type: 'back', name: 'Afro Puffs', icon: '👩‍🦱' },
+
+        { id: 'anime_bangs', type: 'bangs', name: 'Straight Bangs', icon: '✂️' },
+        { id: 'curtain_bangs', type: 'bangs', name: 'Side Locks', icon: '🎀' }
+      ],
+      outfits: [
+        { id: 'school_sailor', name: 'School Sailor Uniform', icon: '🏫' },
+        { id: 'magical_gown', name: 'Magical Girl Dress', icon: '👗' },
+        { id: 'overalls_set', name: 'Denim Overalls Set', icon: '👖' },
+        { id: 'popstar_glitter', name: 'Popstar Idol Dress', icon: '⭐' },
+        { id: 'fairy_tale', name: 'Fairy Princess Gown', icon: '🧚' },
+        { id: 'none', name: 'Top & Skirt Separate', icon: '🚫' }
+      ],
+      tops: [
+        { id: 'none', name: 'No Top', icon: '🚫' },
+        { id: 'sailor_top', name: 'Sailor Collar Top', icon: '👔' },
+        { id: 'cozy_hoodie', name: 'Bunny Hoodie', icon: '🐰' },
+        { id: 'heart_tee', name: 'Sparkle Heart Tee', icon: '👕' },
+        { id: 'cardigan_blouse', name: 'School Cardigan', icon: '🧥' }
+      ],
+      bottoms: [
+        { id: 'none', name: 'No Skirt', icon: '🚫' },
+        { id: 'pleated_skirt', name: 'Pleated School Skirt', icon: '🩰' },
+        { id: 'ruffle_tutu', name: 'Ruffle Tutu Skirt', icon: '👗' },
+        { id: 'denim_shorts', name: 'Cute Star Shorts', icon: '🩳' }
+      ],
+      shoes: [
+        { id: 'none', name: 'Barefoot', icon: '🦶' },
+        { id: 'mary_janes', name: 'School Mary Janes', icon: '👞' },
+        { id: 'sneakers', name: 'Pastel High Tops', icon: '👟' },
+        { id: 'ribbon_flats', name: 'Ballet Ribbon Shoes', icon: '🩰' }
+      ],
+      acc: [
+        { id: 'none_head', type: 'head', name: 'No Hat', icon: '🚫' },
+        { id: 'cat_ears', type: 'head', name: 'Fluffy Cat Ears', icon: '🐱' },
+        { id: 'bunny_ears', type: 'head', name: 'Bunny Ears Band', icon: '🐰' },
+        { id: 'tiara', type: 'head', name: 'Sparkle Tiara', icon: '👑' },
+        { id: 'sailor_bow', type: 'head', name: 'Giant Hair Bow', icon: '🎀' },
+
+        { id: 'none_glasses', type: 'glasses', name: 'No Glasses', icon: '🚫' },
+        { id: 'heart_glasses', type: 'glasses', name: 'Heart Glasses', icon: '🕶️' },
+        { id: 'star_glasses', type: 'glasses', name: 'Star Glasses', icon: '⭐' },
+
+        { id: 'none_hand', type: 'hand', name: 'No Prop', icon: '🚫' },
+        { id: 'boba_tea', type: 'hand', name: 'Boba Milk Tea', icon: '🧋' },
+        { id: 'bear_plush', type: 'hand', name: 'Teddy Bear Plush', icon: '🧸' },
+        { id: 'magic_wand', type: 'hand', name: 'Star Magic Wand', icon: '🪄' }
+      ],
+      pets: [
+        { id: 'none_pet', name: 'No Pet', icon: '🚫' },
+        { id: 'kitten', name: 'Calico Kitten', icon: '🐱' },
+        { id: 'puppy', name: 'Fluffy Puppy', icon: '🐶' },
+        { id: 'panda', name: 'Baby Panda', icon: '🐼' },
+        { id: 'dragon', name: 'Baby Dragon', icon: '🐉' }
+      ]
+    };
+
+
+    /* ===================================================================
+       2. CANVAS RENDERING ENGINE (Chibi Vector Graphics)
+       =================================================================== */
+    function resizeCanvas() {
+      const container = canvas.parentElement;
+      const w = container.clientWidth || 380;
+      const h = container.clientHeight && container.clientHeight > 100 ? container.clientHeight : Math.round(w * (4 / 3));
+      canvas.width = w;
+      canvas.height = h;
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    function addSparkle(x, y) {
+      for (let i = 0; i < 9; i++) {
+        sparkles.push({
+          x: x + (Math.random() - 0.5) * 45,
+          y: y + (Math.random() - 0.5) * 45,
+          vx: (Math.random() - 0.5) * 4,
+          vy: (Math.random() - 0.5) * 4 - 2,
+          size: Math.random() * 8 + 4,
+          color: ['#f43f5e', '#facc15', '#38bdf8', '#c084fc', '#34d399'][Math.floor(Math.random() * 5)],
+          life: 32
+        });
+      }
+    }
+
+    function drawRoundRect(x, y, w, h, r) {
+      if (ctx.roundRect) {
+        ctx.roundRect(x, y, w, h, r);
+      } else {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+      }
+    }
+
+    function renderDoll() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const w = canvas.width;
+      const h = canvas.height;
+      const cx = w / 2;
+      const cy = h * 0.52;
+
+      // 1. Scene Background
+      drawBackground(w, h);
+
+      // 2. Back Hair Layer
+      drawBackHair(cx, cy, dollState.hairBack, dollState.hairColor);
+
+      // 3. Pet Companion
+      if (dollState.accPet !== 'none_pet') drawPet(cx + 88, cy + 128, dollState.accPet);
+
+      // 4. Base Head & Body (Skin Base Layer: Head, Ears, Neck, Torso, Arms, Legs)
+      drawDollSkinBase(cx, cy, dollState.skinTone);
+
+      // 5. Permanent School-Appropriate Modest Base Outfit (Camisole & Bike Shorts)
+      drawBaseModestyOutfit(cx, cy);
+
+      // 6. Shoes & Socks
+      drawShoes(cx, cy, dollState.shoes);
+
+      // 7. Outer Clothes (Dresses OR Tops + Bottoms)
+      if (dollState.dress !== 'none') {
+        drawDress(cx, cy, dollState.dress);
+      } else {
+        drawBottoms(cx, cy, dollState.bottom);
+        drawTops(cx, cy, dollState.top);
+      }
+
+      // 8. Facial Features ONLY (Eyes, Eyebrows, Mouth, Blush, Face Decor)
+      drawFacialFeatures(cx, cy, dollState);
+
+      // 9. Front Hair / Bangs
+      drawFrontBangs(cx, cy, dollState.hairBangs, dollState.hairColor);
+
+      // 10. Accessories (Headwear, Glasses, Handheld Prop)
+      drawHeadwear(cx, cy, dollState.accHead);
+      drawGlasses(cx, cy, dollState.accGlasses);
+      drawHandProp(cx - 62, cy + 38, dollState.accHand);
+
+      // 11. Speech Bubble & Sparkle Effects
+      if (dollState.speechBubble && dollState.speechBubble !== 'none') {
+        drawSpeechBubble(cx + 35, cy - 110, dollState.speechBubble);
+      }
+
+      drawSparkles();
+    }
+
+    /* ===================================================================
+       3. DRAWING HELPER FUNCTIONS FOR SCENE & DOLL
+       =================================================================== */
+    function drawBackground(w, h) {
+      ctx.save();
+      if (dollState.scene === 'classroom') {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#fef08a'); grad.addColorStop(1, '#fed7aa');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+        // Chalkboard
+        ctx.fillStyle = '#15803d';
+        drawRoundRect(20, 20, w - 40, h * 0.3, 12); ctx.fill();
+        ctx.strokeStyle = '#b45309'; ctx.lineWidth = 6; ctx.stroke();
+        ctx.fillStyle = '#ffffff'; ctx.font = '16px Fredoka'; ctx.fillText('✨ School Day! ABC ✨', 35, 55);
+
+      } else if (dollState.scene === 'park') {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#bae6fd'); grad.addColorStop(1, '#bbf7d0');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+        // Cherry Blossom Tree
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.arc(w - 30, 60, 65, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(w - 80, 80, 45, 0, Math.PI * 2); ctx.fill();
+
+      } else if (dollState.scene === 'bedroom') {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#fbcfe8'); grad.addColorStop(1, '#e0e7ff');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+      } else if (dollState.scene === 'castle') {
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#fef3c7'); grad.addColorStop(1, '#ddd6fe');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+
+      } else {
+        // Night Sky
+        const grad = ctx.createLinearGradient(0, 0, 0, h);
+        grad.addColorStop(0, '#1e1b4b'); grad.addColorStop(1, '#312e81');
+        ctx.fillStyle = grad; ctx.fillRect(0, 0, w, h);
+        ctx.fillStyle = '#fde047'; ctx.beginPath(); ctx.arc(w - 50, 50, 25, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawDollSkinBase(cx, cy, skinColor) {
+      ctx.save();
+      const currentSkin = skinColor || dollState.skinTone || '#fce3d3';
+      ctx.fillStyle = currentSkin;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.12)';
+      ctx.lineWidth = 2;
+
+      // 1. Legs (Thighs to Feet)
+      drawRoundRect(cx - 22, cy + 80, 16, 85, 8); ctx.fill(); ctx.stroke();
+      drawRoundRect(cx + 6, cy + 80, 16, 85, 8); ctx.fill(); ctx.stroke();
+
+      // 2. Arms (Shoulders to Hands)
+      drawRoundRect(cx - 52, cy + 12, 14, 72, 7); ctx.fill(); ctx.stroke();
+      drawRoundRect(cx + 38, cy + 12, 14, 72, 7); ctx.fill(); ctx.stroke();
+
+      // 3. Torso
+      drawRoundRect(cx - 28, cy, 56, 88, 14); ctx.fill(); ctx.stroke();
+
+      // 4. Neck Connection
+      drawRoundRect(cx - 10, cy - 14, 20, 22, 4); ctx.fill(); ctx.stroke();
+
+      // 5. Cute Ears (Left & Right)
+      ctx.beginPath(); ctx.arc(cx - 46, cy - 46, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx + 46, cy - 46, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      // Inner Ear Blush
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.25)';
+      ctx.beginPath(); ctx.arc(cx - 46, cy - 46, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + 46, cy - 46, 6, 0, Math.PI * 2); ctx.fill();
+
+      // 6. Main Head Canvas
+      ctx.fillStyle = currentSkin;
+      ctx.beginPath(); ctx.arc(cx, cy - 48, 48, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      ctx.restore();
+    }
+
+    function drawBaseModestyOutfit(cx, cy) {
+      ctx.save();
+      ctx.fillStyle = '#fce7f3';
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 1.5;
+
+      // Bike Shorts
+      drawRoundRect(cx - 26, cy + 50, 52, 32, 6); ctx.fill(); ctx.stroke();
+
+      // Camisole Top
+      drawRoundRect(cx - 26, cy + 8, 52, 42, 6); ctx.fill(); ctx.stroke();
+      ctx.fillRect(cx - 20, cy + 1, 5, 8);
+      ctx.fillRect(cx + 15, cy + 1, 5, 8);
+
+      // Ribbon Accent
+      ctx.fillStyle = '#f43f5e';
+      ctx.beginPath(); ctx.arc(cx, cy + 15, 3, 0, Math.PI * 2); ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawFacialFeatures(cx, cy, state) {
+      ctx.save();
+      const eyeXLeft = cx - 18;
+      const eyeXRight = cx + 18;
+      const eyeY = cy - 52;
+
+      // Eyebrows
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(eyeXLeft, eyeY - 14, 8, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
+      ctx.beginPath(); ctx.arc(eyeXRight, eyeY - 14, 8, Math.PI * 1.15, Math.PI * 1.85); ctx.stroke();
+
+      if (state.eyeShape === 'wink_eye') {
+        // Left eye open, right eye winking
+        ctx.fillStyle = state.eyeColor;
+        ctx.beginPath(); ctx.ellipse(eyeXLeft, eyeY, 8, 11, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#ffffff'; ctx.beginPath(); ctx.arc(eyeXLeft + 2, eyeY - 4, 3.5, 0, Math.PI * 2); ctx.fill();
+
+        ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 3.5;
+        ctx.beginPath(); ctx.arc(eyeXRight, eyeY, 9, Math.PI * 0.1, Math.PI * 0.9); ctx.stroke();
+
+      } else {
+        // Both eyes open with anime sparkle highlights
+        ctx.fillStyle = state.eyeColor;
+        ctx.beginPath(); ctx.ellipse(eyeXLeft, eyeY, 9, 12, 0, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.ellipse(eyeXRight, eyeY, 9, 12, 0, 0, Math.PI * 2); ctx.fill();
+
+        // White Sparkle Highlights
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(eyeXLeft - 2, eyeY - 4, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(eyeXRight - 2, eyeY - 4, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(eyeXLeft + 3, eyeY + 4, 2, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(eyeXRight + 3, eyeY + 4, 2, 0, Math.PI * 2); ctx.fill();
+      }
+
+      // Mouth
+      ctx.strokeStyle = '#e11d48'; ctx.lineWidth = 2.5;
+      if (state.mouth === 'cat_mouth') {
+        ctx.beginPath(); ctx.arc(cx - 3, cy - 35, 4, 0, Math.PI); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx + 3, cy - 35, 4, 0, Math.PI); ctx.stroke();
+      } else if (state.mouth === 'open_happy') {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx, cy - 35, 7, 0, Math.PI); ctx.fill(); ctx.stroke();
+      } else {
+        ctx.beginPath(); ctx.arc(cx, cy - 37, 10, 0.1 * Math.PI, 0.9 * Math.PI); ctx.stroke();
+      }
+
+      // Pink Blush
+      ctx.fillStyle = 'rgba(244, 63, 94, 0.35)';
+      ctx.beginPath(); ctx.ellipse(cx - 26, cy - 40, 8, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(cx + 26, cy - 40, 8, 4.5, 0, 0, Math.PI * 2); ctx.fill();
+
+      // Face Decor / Band-Aid
+      if (state.faceDecor === 'heart_bandage') {
+        ctx.fillStyle = '#fbcfe8'; ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 1;
+        drawRoundRect(cx - 28, cy - 42, 14, 7, 3); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#f43f5e'; ctx.font = '7px sans-serif'; ctx.fillText('❤️', cx - 25, cy - 36);
+      } else if (state.faceDecor === 'cheek_stars') {
+        ctx.fillStyle = '#facc15'; ctx.font = '10px sans-serif';
+        ctx.fillText('⭐', cx - 32, cy - 38); ctx.fillText('⭐', cx + 24, cy - 38);
+      }
+
+      ctx.restore();
+    }
+
+    function drawBackHair(cx, cy, style, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'; ctx.lineWidth = 2;
+
+      if (style === 'twin_pigtails') {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx - 48, cy - 52, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 48, cy - 52, 6, 0, Math.PI * 2); ctx.fill();
+
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.ellipse(cx - 56, cy - 25, 15, 42, -0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(cx + 56, cy - 25, 15, 42, 0.3, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      } else if (style === 'long_waves') {
+        drawRoundRect(cx - 56, cy - 60, 112, 120, 30); ctx.fill(); ctx.stroke();
+
+      } else if (style === 'afro_puffs') {
+        ctx.beginPath(); ctx.arc(cx - 48, cy - 55, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx + 48, cy - 55, 22, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      } else if (style === 'crown_braid') {
+        ctx.beginPath(); ctx.arc(cx, cy - 48, 52, Math.PI * 0.8, Math.PI * 2.2); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx - 50, cy - 40, 100, 70, 20); ctx.fill(); ctx.stroke();
+
+      } else {
+        // Bob
+        drawRoundRect(cx - 52, cy - 65, 104, 75, 24); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawFrontBangs(cx, cy, style, color) {
+      ctx.save();
+      ctx.fillStyle = color;
+      ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)'; ctx.lineWidth = 2;
+
+      // Crown Cap
+      ctx.beginPath();
+      ctx.arc(cx, cy - 48, 49, Math.PI * 1.15, Math.PI * 1.85);
+      ctx.quadraticCurveTo(cx, cy - 65, cx - 44, cy - 68);
+      ctx.closePath();
+      ctx.fill(); ctx.stroke();
+
+      // Front Bang Strands
+      if (style === 'curtain_bangs') {
+        ctx.beginPath();
+        ctx.moveTo(cx - 44, cy - 68); ctx.quadraticCurveTo(cx - 30, cy - 55), ctx.lineTo(cx - 36, cy - 42);
+        ctx.lineTo(cx - 48, cy - 52); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(cx + 44, cy - 68); ctx.quadraticCurveTo(cx + 30, cy - 55), ctx.lineTo(cx + 36, cy - 42);
+        ctx.lineTo(cx + 48, cy - 52); ctx.closePath(); ctx.fill(); ctx.stroke();
+      } else {
+        for (let x = cx - 32; x <= cx + 32; x += 12) {
+          ctx.beginPath();
+          ctx.moveTo(x - 5, cy - 68); ctx.lineTo(x, cy - 60); ctx.lineTo(x + 5, cy - 68);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        }
+      }
+      ctx.restore();
+    }
+
+    /* ===================================================================
+       PRECISION FITTED WARDROBE RENDERERS
+       =================================================================== */
+    function drawDress(cx, cy, dressId) {
+      if (dressId === 'none') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 2;
+
+      if (dressId === 'school_sailor') {
+        // Fitted Sailor Collar Top
+        ctx.fillStyle = '#1e3a8a';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 6); ctx.fill(); ctx.stroke();
+        
+        // Short Sleeves over upper arms
+        drawRoundRect(cx - 50, cy + 8, 20, 22, 5); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 30, cy + 8, 20, 22, 5); ctx.fill(); ctx.stroke();
+
+        // White Sailor Collar & Ribbon
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(cx - 20, cy + 2);
+        ctx.lineTo(cx, cy + 22);
+        ctx.lineTo(cx + 20, cy + 2);
+        ctx.lineTo(cx + 28, cy + 2);
+        ctx.lineTo(cx, cy + 30);
+        ctx.lineTo(cx - 28, cy + 2);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx, cy + 22, 5, 0, Math.PI * 2); ctx.fill();
+
+        // Fitted Pleated Skirt
+        ctx.fillStyle = '#1e3a8a';
+        ctx.beginPath();
+        ctx.moveTo(cx - 28, cy + 48); ctx.lineTo(cx + 28, cy + 48);
+        ctx.lineTo(cx + 42, cy + 88); ctx.lineTo(cx - 42, cy + 88);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Skirt Hem Trim
+        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2;
+        ctx.beginPath(); ctx.moveTo(cx - 40, cy + 82); ctx.lineTo(cx + 40, cy + 82); ctx.stroke();
+
+      } else if (dressId === 'magical_gown') {
+        // Magical Girl Bodice with Shoulder Sleeves
+        ctx.fillStyle = '#ec4899';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 8); ctx.fill(); ctx.stroke();
+
+        // Puff Cap Sleeves
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.arc(cx - 36, cy + 12, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx + 36, cy + 12, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Gold Waist Brooch
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath(); ctx.arc(cx, cy + 24, 7, 0, Math.PI * 2); ctx.fill();
+
+        // Layered Flared Princess Skirt
+        ctx.fillStyle = '#ec4899';
+        ctx.beginPath();
+        ctx.moveTo(cx - 29, cy + 48); ctx.lineTo(cx + 29, cy + 48);
+        ctx.lineTo(cx + 65, cy + 122); ctx.lineTo(cx - 65, cy + 122);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Overskirt Ruffle
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.moveTo(cx - 29, cy + 48);
+        ctx.quadraticCurveTo(cx, cy + 85, cx + 29, cy + 48);
+        ctx.quadraticCurveTo(cx + 50, cy + 85, cx + 45, cy + 105);
+        ctx.lineTo(cx - 45, cy + 105);
+        ctx.closePath(); ctx.fill();
+
+      } else if (dressId === 'overalls_set') {
+        // Inner Short-Sleeve Yellow Tee
+        ctx.fillStyle = '#fde047';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 6); ctx.fill();
+        drawRoundRect(cx - 48, cy + 8, 18, 20, 5); ctx.fill();
+        drawRoundRect(cx + 30, cy + 8, 18, 20, 5); ctx.fill();
+
+        // Denim Overalls Bib & Straps
+        ctx.fillStyle = '#0284c7';
+        drawRoundRect(cx - 20, cy + 16, 40, 32, 5); ctx.fill(); ctx.stroke();
+        ctx.fillRect(cx - 18, cy + 2, 6, 16);
+        ctx.fillRect(cx + 12, cy + 2, 6, 16);
+
+        // Brass Buttons
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath(); ctx.arc(cx - 15, cy + 18, 3, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 15, cy + 18, 3, 0, Math.PI * 2); ctx.fill();
+
+        // Overall Shorts
+        drawRoundRect(cx - 28, cy + 46, 56, 36, 8); ctx.fill(); ctx.stroke();
+
+      } else if (dressId === 'popstar_glitter') {
+        // Glitter Idol Bodice & Mesh Shoulder Ruffles
+        ctx.fillStyle = '#a855f7';
+        drawRoundRect(cx - 29, cy + 2, 58, 44, 8); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#e9d5ff';
+        ctx.beginPath(); ctx.arc(cx - 36, cy + 10, 12, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(cx + 36, cy + 10, 12, 0, Math.PI * 2); ctx.fill();
+
+        // 3-Tier Ruffle Skirt
+        const colors = ['#c084fc', '#e879f9', '#f43f5e'];
+        [0, 12, 24].forEach((offset, idx) => {
+          ctx.fillStyle = colors[idx];
+          ctx.beginPath();
+          ctx.moveTo(cx - 30 - idx * 4, cy + 46 + offset);
+          ctx.lineTo(cx + 30 + idx * 4, cy + 46 + offset);
+          ctx.lineTo(cx + 38 + idx * 5, cy + 64 + offset);
+          ctx.lineTo(cx - 38 - idx * 5, cy + 64 + offset);
+          ctx.closePath(); ctx.fill(); ctx.stroke();
+        });
+
+      } else {
+        // Fairy Tale Gown
+        ctx.fillStyle = '#f472b6';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 8); ctx.fill(); ctx.stroke();
+
+        // Off-Shoulder Ruffle
+        ctx.fillStyle = '#fbcfe8';
+        drawRoundRect(cx - 44, cy + 6, 88, 14, 7); ctx.fill(); ctx.stroke();
+
+        // Ballgown Skirt
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath();
+        ctx.moveTo(cx - 29, cy + 48); ctx.lineTo(cx + 29, cy + 48);
+        ctx.lineTo(cx + 68, cy + 128); ctx.lineTo(cx - 68, cy + 128);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawTops(cx, cy, topId) {
+      if (topId === 'none') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 2;
+
+      if (topId === 'sailor_top') {
+        ctx.fillStyle = '#1e3a8a';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx - 50, cy + 8, 20, 22, 5); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 30, cy + 8, 20, 22, 5); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(cx - 20, cy + 2); ctx.lineTo(cx, cy + 22); ctx.lineTo(cx + 20, cy + 2);
+        ctx.lineTo(cx + 28, cy + 2); ctx.lineTo(cx, cy + 30); ctx.lineTo(cx - 28, cy + 2);
+        ctx.closePath(); ctx.fill();
+
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx, cy + 22, 5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (topId === 'cozy_hoodie') {
+        // Oversized Soft Bunny Hoodie
+        ctx.fillStyle = '#f472b6';
+        drawRoundRect(cx - 31, cy, 62, 50, 10); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx - 52, cy + 6, 20, 36, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 32, cy + 6, 20, 36, 6); ctx.fill(); ctx.stroke();
+
+        // Kangaroo Pocket
+        ctx.fillStyle = '#fbcfe8';
+        drawRoundRect(cx - 18, cy + 28, 36, 18, 5); ctx.fill(); ctx.stroke();
+
+      } else if (topId === 'heart_tee') {
+        // Fitted Sparkle Heart Tee
+        ctx.fillStyle = '#c084fc';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx - 48, cy + 8, 18, 20, 5); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 30, cy + 8, 18, 20, 5); ctx.fill(); ctx.stroke();
+
+        // Center Heart Graphic
+        ctx.fillStyle = '#f43f5e';
+        ctx.font = '16px sans-serif'; ctx.textAlign = 'center';
+        ctx.fillText('💖', cx, cy + 28);
+
+      } else if (topId === 'cardigan_blouse') {
+        // School Cardigan & Collar
+        ctx.fillStyle = '#34d399';
+        drawRoundRect(cx - 29, cy + 2, 58, 46, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx - 50, cy + 6, 20, 38, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 30, cy + 6, 20, 38, 6); ctx.fill(); ctx.stroke();
+
+        // Inner White Shirt V-Neck
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.moveTo(cx - 14, cy + 2); ctx.lineTo(cx, cy + 24); ctx.lineTo(cx + 14, cy + 2);
+        ctx.closePath(); ctx.fill();
+      }
+      ctx.restore();
+    }
+
+    function drawBottoms(cx, cy, bottomId) {
+      if (bottomId === 'none') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+      ctx.lineWidth = 2;
+
+      if (bottomId === 'pleated_skirt') {
+        ctx.fillStyle = '#1e3a8a';
+        ctx.beginPath();
+        ctx.moveTo(cx - 28, cy + 46); ctx.lineTo(cx + 28, cy + 46);
+        ctx.lineTo(cx + 42, cy + 84); ctx.lineTo(cx - 42, cy + 84);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Pleat Lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.3)'; ctx.lineWidth = 1.5;
+        for (let x = -24; x <= 24; x += 8) {
+          ctx.beginPath(); ctx.moveTo(cx + x, cy + 46); ctx.lineTo(cx + x * 1.4, cy + 84); ctx.stroke();
+        }
+
+      } else if (bottomId === 'ruffle_tutu') {
+        // Multi-Layer Pink Tutu
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.ellipse(cx, cy + 62, 45, 20, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath(); ctx.ellipse(cx, cy + 66, 40, 16, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Bow Accent
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.arc(cx, cy + 48, 4, 0, Math.PI * 2); ctx.fill();
+
+      } else if (bottomId === 'denim_shorts') {
+        // Fitted Denim Shorts
+        ctx.fillStyle = '#0284c7';
+        drawRoundRect(cx - 28, cy + 46, 56, 32, 6); ctx.fill(); ctx.stroke();
+
+        // Leg Cuffs hugging thighs
+        drawRoundRect(cx - 27, cy + 68, 25, 12, 4); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 2, cy + 68, 25, 12, 4); ctx.fill(); ctx.stroke();
+
+        // Star Patch
+        ctx.fillStyle = '#facc15'; ctx.font = '10px sans-serif';
+        ctx.fillText('⭐', cx + 12, cy + 62);
+      }
+      ctx.restore();
+    }
+
+    function drawShoes(cx, cy, shoeId) {
+      if (shoeId === 'none') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+      ctx.lineWidth = 1.5;
+
+      if (shoeId === 'mary_janes') {
+        ctx.fillStyle = '#1e293b';
+        drawRoundRect(cx - 25, cy + 148, 22, 18, 5); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 3, cy + 148, 22, 18, 5); ctx.fill(); ctx.stroke();
+
+        // Ankle Straps
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(cx - 25, cy + 152, 22, 4);
+        ctx.fillRect(cx + 3, cy + 152, 22, 4);
+
+      } else if (shoeId === 'sneakers') {
+        // High Top Pastel Sneakers
+        ctx.fillStyle = '#38bdf8';
+        drawRoundRect(cx - 25, cy + 142, 22, 24, 6); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 3, cy + 142, 22, 24, 6); ctx.fill(); ctx.stroke();
+
+        // White Toe Caps & Soles
+        ctx.fillStyle = '#ffffff';
+        drawRoundRect(cx - 25, cy + 160, 22, 6, 2); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 3, cy + 160, 22, 6, 2); ctx.fill(); ctx.stroke();
+
+      } else if (shoeId === 'ribbon_flats') {
+        // Ballet Ribbon Shoes
+        ctx.fillStyle = '#f43f5e';
+        drawRoundRect(cx - 24, cy + 150, 20, 16, 5); ctx.fill(); ctx.stroke();
+        drawRoundRect(cx + 4, cy + 150, 20, 16, 5); ctx.fill(); ctx.stroke();
+
+        // Ankle Ribbon Wraps
+        ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(cx - 22, cy + 150); ctx.lineTo(cx - 8, cy + 138);
+        ctx.moveTo(cx - 8, cy + 150); ctx.lineTo(cx - 22, cy + 138);
+        ctx.moveTo(cx + 6, cy + 150); ctx.lineTo(cx + 20, cy + 138);
+        ctx.moveTo(cx + 20, cy + 150); ctx.lineTo(cx + 6, cy + 138);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawHeadwear(cx, cy, headId) {
+      if (headId === 'none_head') return;
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)'; ctx.lineWidth = 2;
+
+      if (headId === 'cat_ears') {
+        ctx.fillStyle = '#f472b6';
+        // Left Ear
+        ctx.beginPath(); ctx.moveTo(cx - 42, cy - 75); ctx.lineTo(cx - 28, cy - 105); ctx.lineTo(cx - 14, cy - 80); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Right Ear
+        ctx.beginPath(); ctx.moveTo(cx + 14, cy - 80); ctx.lineTo(cx + 28, cy - 105); ctx.lineTo(cx + 42, cy - 75); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        // Pink Inner Ears
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath(); ctx.moveTo(cx - 38, cy - 76); ctx.lineTo(cx - 28, cy - 98); ctx.lineTo(cx - 18, cy - 80); ctx.closePath(); ctx.fill();
+        ctx.beginPath(); ctx.moveTo(cx + 18, cy - 80); ctx.lineTo(cx + 28, cy - 98); ctx.lineTo(cx + 38, cy - 76); ctx.closePath(); ctx.fill();
+
+      } else if (headId === 'bunny_ears') {
+        ctx.fillStyle = '#ffffff';
+        // Left Bunny Ear
+        drawRoundRect(cx - 24, cy - 130, 16, 55, 8); ctx.fill(); ctx.stroke();
+        // Right Bunny Ear
+        drawRoundRect(cx + 8, cy - 130, 16, 55, 8); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#fbcfe8';
+        drawRoundRect(cx - 21, cy - 124, 10, 44, 5); ctx.fill();
+        drawRoundRect(cx + 11, cy - 124, 10, 44, 5); ctx.fill();
+
+      } else if (headId === 'tiara') {
+        ctx.fillStyle = '#facc15';
+        ctx.beginPath();
+        ctx.moveTo(cx - 30, cy - 78);
+        ctx.lineTo(cx - 20, cy - 95);
+        ctx.lineTo(cx, cy - 82);
+        ctx.lineTo(cx + 20, cy - 95);
+        ctx.lineTo(cx + 30, cy - 78);
+        ctx.closePath(); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#ec4899';
+        ctx.beginPath(); ctx.arc(cx, cy - 86, 3.5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (headId === 'sailor_bow') {
+        ctx.fillStyle = '#f43f5e';
+        ctx.beginPath(); ctx.ellipse(cx - 25, cy - 85, 20, 12, -0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(cx + 25, cy - 85, 20, 12, 0.2, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy - 85, 7, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawGlasses(cx, cy, glassesId) {
+      if (glassesId === 'none_glasses') return;
+      ctx.save();
+      const eyeY = cy - 52;
+
+      if (glassesId === 'heart_glasses') {
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.45)';
+        ctx.strokeStyle = '#f43f5e'; ctx.lineWidth = 3;
+
+        // Left Heart Frame
+        ctx.beginPath(); ctx.arc(cx - 22, eyeY - 2, 10, Math.PI, 0); ctx.arc(cx - 10, eyeY - 2, 10, Math.PI, 0); ctx.lineTo(cx - 16, eyeY + 12); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Right Heart Frame
+        ctx.beginPath(); ctx.arc(cx + 10, eyeY - 2, 10, Math.PI, 0); ctx.arc(cx + 22, eyeY - 2, 10, Math.PI, 0); ctx.lineTo(cx + 16, eyeY + 12); ctx.closePath(); ctx.fill(); ctx.stroke();
+        // Bridge
+        ctx.beginPath(); ctx.moveTo(cx - 6, eyeY); ctx.lineTo(cx + 6, eyeY); ctx.stroke();
+
+      } else if (glassesId === 'star_glasses') {
+        ctx.fillStyle = 'rgba(250, 204, 21, 0.6)';
+        ctx.strokeStyle = '#eab308'; ctx.lineWidth = 2.5;
+
+        ctx.font = '22px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('⭐', cx - 18, eyeY);
+        ctx.fillText('⭐', cx + 18, eyeY);
+      }
+      ctx.restore();
+    }
+
+    function drawHandProp(x, y, handId) {
+      if (handId === 'none_hand') return;
+      ctx.save();
+
+      if (handId === 'boba_tea') {
+        // Cup
+        ctx.fillStyle = '#fed7aa'; ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 1.5;
+        drawRoundRect(x - 12, y - 10, 24, 32, 4); ctx.fill(); ctx.stroke();
+
+        // Lid & Straw
+        ctx.fillStyle = '#f43f5e'; ctx.fillRect(x - 14, y - 14, 28, 5);
+        ctx.strokeStyle = '#38bdf8'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x, y - 14); ctx.lineTo(x + 4, y - 24); ctx.stroke();
+
+        // Boba Pearls
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.arc(x - 5, y + 14, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 4, y + 15, 2.5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x, y + 8, 2.5, 0, Math.PI * 2); ctx.fill();
+
+      } else if (handId === 'bear_plush') {
+        // Teddy Bear Body & Head
+        ctx.fillStyle = '#b45309'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(x, y + 8, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y - 10, 11, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        // Ears
+        ctx.beginPath(); ctx.arc(x - 9, y - 18, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x + 9, y - 18, 4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      } else if (handId === 'magic_wand') {
+        // Wand Shaft
+        ctx.strokeStyle = '#facc15'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(x + 5, y + 25); ctx.lineTo(x - 12, y - 25); ctx.stroke();
+
+        // Wand Star Head
+        ctx.fillStyle = '#f43f5e'; ctx.font = '20px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('⭐', x - 12, y - 25);
+      }
+      ctx.restore();
+    }
+
+    function drawPet(x, y, petId) {
+      if (petId === 'none_pet') return;
+      ctx.save();
+
+      if (petId === 'kitten') {
+        ctx.fillStyle = '#fdba74'; ctx.strokeStyle = '#c2410c'; ctx.lineWidth = 1.5;
+        // Body
+        ctx.beginPath(); ctx.ellipse(x, y + 10, 14, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Head
+        ctx.beginPath(); ctx.arc(x, y - 10, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Ears
+        ctx.beginPath(); ctx.moveTo(x - 10, y - 16); ctx.lineTo(x - 5, y - 25); ctx.lineTo(x, y - 18); ctx.closePath(); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(x, y - 18); ctx.lineTo(x + 5, y - 25); ctx.lineTo(x + 10, y - 16); ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      } else if (petId === 'puppy') {
+        ctx.fillStyle = '#d97706'; ctx.strokeStyle = '#78350f'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.ellipse(x, y + 10, 15, 18, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y - 10, 13, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Floppy Ears
+        ctx.beginPath(); ctx.ellipse(x - 12, y - 8, 5, 10, 0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.ellipse(x + 12, y - 8, 5, 10, -0.4, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+      } else if (petId === 'panda') {
+        ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#1e293b'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(x, y + 10, 16, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y - 10, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath(); ctx.arc(x - 11, y - 20, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 11, y - 20, 5, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x - 5, y - 10, 4, 0, Math.PI * 2); ctx.fill();
+        ctx.beginPath(); ctx.arc(x + 5, y - 10, 4, 0, Math.PI * 2); ctx.fill();
+
+      } else if (petId === 'dragon') {
+        ctx.fillStyle = '#c084fc'; ctx.strokeStyle = '#6b21a8'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(x, y + 8, 14, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        ctx.beginPath(); ctx.arc(x, y - 10, 12, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+        // Tiny Wings
+        ctx.fillStyle = '#f472b6';
+        ctx.beginPath(); ctx.arc(x - 16, y + 4, 8, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawSpeechBubble(x, y, text) {
+      ctx.save();
+      ctx.font = 'bold 13px Fredoka, sans-serif';
+      const textWidth = ctx.measureText(text).width;
+      const padding = 12;
+      const bw = textWidth + padding * 2;
+      const bh = 28;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2.5;
+
+      // Bubble Main Box
+      drawRoundRect(x - bw / 2, y - bh / 2, bw, bh, 14); ctx.fill(); ctx.stroke();
+
+      // Tail
+      ctx.beginPath();
+      ctx.moveTo(x - 6, y + bh / 2);
+      ctx.lineTo(x - 16, y + bh / 2 + 10);
+      ctx.lineTo(x + 2, y + bh / 2);
+      ctx.closePath(); ctx.fill(); ctx.stroke();
+
+      // Text
+      ctx.fillStyle = '#be123c'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+      ctx.fillText(text, x, y);
+      ctx.restore();
+    }
+
+    function drawSparkles() {
+      for (let i = sparkles.length - 1; i >= 0; i--) {
+        const s = sparkles[i];
+        s.x += s.vx;
+        s.y += s.vy;
+        s.life--;
+
+        ctx.save();
+        ctx.fillStyle = s.color;
+        ctx.globalAlpha = Math.max(0, s.life / 32);
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size / 2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        if (s.life <= 0) sparkles.splice(i, 1);
+      }
+    }
+
+
+    /* ===================================================================
+       4. UI CONTROLS & EVENT HANDLERS
+       =================================================================== */
+    function selectCategory(catKey) {
+      activeCategory = catKey;
+
+      document.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('btn-cat-active'));
+      const activeBtn = document.getElementById(`cat-${catKey}`);
+      if (activeBtn) activeBtn.classList.add('btn-cat-active');
+
+      renderSubBar();
+      renderItemGrid();
+      audio.playPop();
+    }
+
+    function renderSubBar() {
+      const container = document.getElementById('subBarContainer');
+      container.innerHTML = '';
+
+      if (activeCategory === 'face') {
+        container.innerHTML = `
+          <span class="text-xs font-bold text-rose-900 mr-1">Skin Tone:</span>
+          <div class="flex items-center gap-1.5 mr-3">
+            ${skinTones.map(s => `
+              <button onclick="setSkinTone('${s.hex}')" title="${s.name}" class="w-6 h-6 rounded-full border-2 border-white shadow hover:scale-110 transition ${dollState.skinTone === s.hex ? 'ring-2 ring-rose-500 scale-110' : ''}" style="background:${s.hex}"></button>
+            `).join('')}
+          </div>
+          <span class="text-xs font-bold text-rose-900 mr-1">Eye Color:</span>
+          <div class="flex items-center gap-1.5">
+            ${eyeColors.map(e => `
+              <button onclick="setEyeColor('${e.hex}')" title="${e.name}" class="w-6 h-6 rounded-full border-2 border-white shadow hover:scale-110 transition ${dollState.eyeColor === e.hex ? 'ring-2 ring-rose-500 scale-110' : ''}" style="background:${e.hex}"></button>
+            `).join('')}
+          </div>
+        `;
+      } else if (activeCategory === 'hair') {
+        container.innerHTML = `
+          <span class="text-xs font-bold text-amber-900 mr-1">Hair Color Palette:</span>
+          <div class="flex items-center gap-1.5 overflow-x-auto py-0.5">
+            ${hairColors.map(h => `
+              <button onclick="setHairColor('${h.hex}')" title="${h.name}" class="w-6 h-6 rounded-full border-2 border-white shadow hover:scale-110 transition ${dollState.hairColor === h.hex ? 'ring-2 ring-rose-500 scale-110' : ''} flex-shrink-0" style="background:${h.hex}"></button>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        container.innerHTML = `
+          <span class="text-xs font-bold text-purple-900">✨ Mix & Match items below to style your Darling Doll! ✨</span>
+        `;
+      }
+    }
+
+    function renderItemGrid() {
+      const grid = document.getElementById('itemGrid');
+      grid.innerHTML = '';
+
+      const items = wardrobe[activeCategory] || [];
+      items.forEach(item => {
+        let isEquipped = false;
+        if (activeCategory === 'outfits') isEquipped = (dollState.dress === item.id);
+        else if (activeCategory === 'tops') isEquipped = (dollState.top === item.id);
+        else if (activeCategory === 'bottoms') isEquipped = (dollState.bottom === item.id);
+        else if (activeCategory === 'shoes') isEquipped = (dollState.shoes === item.id);
+        else if (activeCategory === 'pets') isEquipped = (dollState.accPet === item.id);
+        else if (activeCategory === 'face') {
+          isEquipped = (dollState.eyeShape === item.id || dollState.mouth === item.id || dollState.faceDecor === item.id);
+        } else if (activeCategory === 'hair') {
+          isEquipped = (dollState.hairBack === item.id || dollState.hairBangs === item.id);
+        } else if (activeCategory === 'acc') {
+          isEquipped = (dollState.accHead === item.id || dollState.accGlasses === item.id || dollState.accHand === item.id);
+        }
+
+        const card = document.createElement('button');
+        card.className = `flex flex-col items-center justify-center p-2.5 rounded-2xl border-3 transition duration-150 bg-white/90 hover:bg-white shadow-sm ${
+          isEquipped ? 'border-rose-500 bg-rose-50 ring-2 ring-rose-300 scale-105' : 'border-pink-200 hover:border-pink-400'
+        }`;
+        card.onclick = () => { equipItem(item); };
+
+        card.innerHTML = `
+          <span class="text-3xl sm:text-4xl mb-1">${item.icon}</span>
+          <span class="text-xs font-extrabold text-slate-800 text-center leading-tight">${item.name}</span>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function equipItem(item) {
+      audio.init();
+      audio.playPop();
+      addSparkle(canvas.width / 2, canvas.height / 2);
+
+      if (activeCategory === 'outfits') {
+        dollState.dress = item.id;
+        if (item.id !== 'none') { dollState.top = 'none'; dollState.bottom = 'none'; }
+      } else if (activeCategory === 'tops') {
+        dollState.top = item.id;
+        if (item.id !== 'none') dollState.dress = 'none';
+      } else if (activeCategory === 'bottoms') {
+        dollState.bottom = item.id;
+        if (item.id !== 'none') dollState.dress = 'none';
+      } else if (activeCategory === 'shoes') {
+        dollState.shoes = item.id;
+      } else if (activeCategory === 'pets') {
+        dollState.accPet = item.id;
+      } else if (activeCategory === 'face') {
+        if (item.type === 'eyeShape') dollState.eyeShape = item.id;
+        else if (item.type === 'mouth') dollState.mouth = item.id;
+        else if (item.type === 'faceDecor') dollState.faceDecor = item.id;
+      } else if (activeCategory === 'hair') {
+        if (item.type === 'back') dollState.hairBack = item.id;
+        else if (item.type === 'bangs') dollState.hairBangs = item.id;
+      } else if (activeCategory === 'acc') {
+        if (item.type === 'head') dollState.accHead = item.id;
+        else if (item.type === 'glasses') dollState.accGlasses = item.id;
+        else if (item.type === 'hand') dollState.accHand = item.id;
+      }
+
+      renderItemGrid();
+    }
+
+    function setSkinTone(hex) {
+      dollState.skinTone = hex;
+      audio.playPop();
+      addSparkle(canvas.width / 2, canvas.height * 0.4);
+      renderSubBar();
+      renderItemGrid();
+    }
+    function setEyeColor(hex) {
+      dollState.eyeColor = hex;
+      audio.playPop();
+      renderSubBar();
+      renderItemGrid();
+    }
+    function setHairColor(hex) {
+      dollState.hairColor = hex;
+      audio.playPop();
+      renderSubBar();
+      renderItemGrid();
+    }
+    function setScene(sc) { dollState.scene = sc; audio.playChime(); }
+    function setSpeechBubble(val) { dollState.speechBubble = val; audio.playPop(); }
+
+    function randomizeOutfit() {
+      audio.init();
+      audio.playChime();
+      addSparkle(canvas.width / 2, canvas.height / 2);
+
+      dollState.skinTone = skinTones[Math.floor(Math.random() * skinTones.length)].hex;
+      dollState.eyeColor = eyeColors[Math.floor(Math.random() * eyeColors.length)].hex;
+      dollState.hairColor = hairColors[Math.floor(Math.random() * hairColors.length)].hex;
+
+      dollState.eyeShape = wardrobe.face.filter(i => i.type === 'eyeShape')[Math.floor(Math.random() * 3)].id;
+      dollState.mouth = wardrobe.face.filter(i => i.type === 'mouth')[Math.floor(Math.random() * 3)].id;
+      dollState.hairBack = wardrobe.hair.filter(i => i.type === 'back')[Math.floor(Math.random() * 5)].id;
+
+      const outfitTypes = ['dress', 'top_bottom'];
+      if (Math.random() > 0.5) {
+        dollState.dress = wardrobe.outfits[Math.floor(Math.random() * (wardrobe.outfits.length - 1))].id;
+        dollState.top = 'none'; dollState.bottom = 'none';
+      } else {
+        dollState.dress = 'none';
+        dollState.top = wardrobe.tops[Math.floor(Math.random() * (wardrobe.tops.length - 1)) + 1].id;
+        dollState.bottom = wardrobe.bottoms[Math.floor(Math.random() * (wardrobe.bottoms.length - 1)) + 1].id;
+      }
+
+      dollState.shoes = wardrobe.shoes[Math.floor(Math.random() * wardrobe.shoes.length)].id;
+      dollState.accHead = wardrobe.acc.filter(i => i.type === 'head')[Math.floor(Math.random() * 5)].id;
+      dollState.accHand = wardrobe.acc.filter(i => i.type === 'hand')[Math.floor(Math.random() * 4)].id;
+      dollState.accPet = wardrobe.pets[Math.floor(Math.random() * wardrobe.pets.length)].id;
+
+      renderItemGrid();
+    }
+
+    function resetDoll() {
+      audio.init();
+      audio.playPop();
+      dollState.skinTone = '#fce3d3';
+      dollState.eyeColor = '#2563eb';
+      dollState.eyeShape = 'sparkle_anime';
+      dollState.mouth = 'happy_smile';
+      dollState.faceDecor = 'heart_bandage';
+      dollState.hairBangs = 'anime_bangs';
+      dollState.hairBack = 'twin_pigtails';
+      dollState.hairColor = '#facc15';
+      dollState.dress = 'school_sailor';
+      dollState.top = 'none';
+      dollState.bottom = 'none';
+      dollState.shoes = 'mary_janes';
+      dollState.accHead = 'cat_ears';
+      dollState.accGlasses = 'none';
+      dollState.accHand = 'boba_tea';
+      dollState.accPet = 'kitten';
+      dollState.speechBubble = 'Kawaii! ✨';
+      dollState.scene = 'classroom';
+
+      document.getElementById('bubbleSelect').value = 'Kawaii! ✨';
+      renderItemGrid();
+    }
+
+    // Photo Studio Snapshot Modal
+    function openPhotoModal() {
+      audio.init();
+      audio.playShutter();
+
+      const snapshotImg = document.getElementById('snapshotImg');
+      snapshotImg.src = canvas.toDataURL('image/png');
+
+      document.getElementById('photoModal').classList.remove('hidden');
+    }
+
+    function closePhotoModal() {
+      document.getElementById('photoModal').classList.add('hidden');
+    }
+
+    function downloadSnapshot() {
+      const link = document.createElement('a');
+      link.download = 'darling-doll-stylist.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+
+    // Interactive Tap Sparkles on Canvas
+    canvas.addEventListener('pointerdown', (e) => {
+      audio.init();
+      audio.playPop();
+      const rect = canvas.getBoundingClientRect();
+      const x = (e.clientX - rect.left) * (canvas.width / rect.width);
+      const y = (e.clientY - rect.top) * (canvas.height / rect.height);
+      addSparkle(x, y);
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' || e.code === 'KeyR') {
+        e.preventDefault();
+        randomizeOutfit();
+      } else if (e.code === 'ArrowRight') {
+        const catKeys = Object.keys(wardrobe);
+        const nextIdx = (catKeys.indexOf(activeCategory) + 1) % catKeys.length;
+        selectCategory(catKeys[nextIdx]);
+      } else if (e.code === 'ArrowLeft') {
+        const catKeys = Object.keys(wardrobe);
+        const prevIdx = (catKeys.indexOf(activeCategory) - 1 + catKeys.length) % catKeys.length;
+        selectCategory(catKeys[prevIdx]);
+      }
+    });
+
+    /* ===================================================================
+       5. MAIN ANIMATION LOOP & INITIALIZATION
+       =================================================================== */
+    function gameLoop() {
+      renderDoll();
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.onload = () => {
+      resizeCanvas();
+      selectCategory('face');
+      gameLoop();
+    };
+  </script>
+</body>
+</html>

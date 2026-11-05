@@ -105,7 +105,7 @@
         </div>
 
         <!-- Mini-Game Selection Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 w-full max-w-4xl px-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 w-full max-w-5xl px-4">
           <!-- Soccer Card -->
           <button onclick="startGame('soccer')" class="bg-gradient-to-b from-green-400 to-emerald-600 hover:from-green-300 hover:to-emerald-500 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
             <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">⚽</div>
@@ -126,7 +126,15 @@
           <button onclick="startGame('basketball')" class="bg-gradient-to-b from-orange-400 to-red-600 hover:from-orange-300 hover:to-red-500 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
             <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">🏀</div>
             <h2 class="text-2xl sm:text-3xl font-extrabold text-white drop-shadow">BASKETBALL</h2>
-            <p class="text-sm sm:text-base text-orange-100 font-medium mt-1">Tap to Bounce & Score like Tap Tap Shots! 🏀🔥</p>
+            <p class="text-sm sm:text-base text-orange-100 font-medium mt-1">Tap to Bounce & Score! 🏀🔥</p>
+            <span class="mt-4 bg-yellow-400 text-yellow-950 px-5 py-2 rounded-full font-extrabold text-lg sm:text-xl shadow">PLAY! ▶</span>
+          </button>
+
+          <!-- Baseball Card -->
+          <button onclick="startGame('baseball')" class="bg-gradient-to-b from-red-500 to-rose-700 hover:from-red-400 hover:to-rose-600 border-4 border-white rounded-3xl p-5 flex flex-col items-center justify-between text-center btn-super transform hover:scale-105 transition">
+            <div class="text-6xl sm:text-8xl mb-2 animate-wiggle">⚾</div>
+            <h2 class="text-2xl sm:text-3xl font-extrabold text-white drop-shadow">BASEBALL</h2>
+            <p class="text-sm sm:text-base text-red-100 font-medium mt-1">Tap to Swing for Home Runs! 💥</p>
             <span class="mt-4 bg-yellow-400 text-yellow-950 px-5 py-2 rounded-full font-extrabold text-lg sm:text-xl shadow">PLAY! ▶</span>
           </button>
         </div>
@@ -247,6 +255,12 @@
         if (this.muted || !this.ctx) return;
         this.playTone(800, 0.1, 'sine', 0.2);
         setTimeout(() => this.playTone(1200, 0.15, 'triangle', 0.25), 50);
+      },
+
+      playHit() {
+        if (this.muted || !this.ctx) return;
+        this.playTone(600, 0.15, 'square', 0.3);
+        setTimeout(() => this.playTone(1000, 0.2, 'sine', 0.3), 40);
       },
 
       playCheer() {
@@ -850,6 +864,139 @@
 
 
     /* ===================================================================
+       6.5 MINI-GAME 4: BASEBALL HOME RUN HITTER ⚾
+       =================================================================== */
+    const baseballGame = {
+      ball: { x: 0, y: 0, vx: 0, vy: 0, scale: 1, radius: 20, state: 'ready' },
+      batter: { x: 0, y: 0, swingAngle: -0.3, isSwinging: false, swingTimer: 0 },
+      pitchTimer: 0,
+
+      reset() {
+        this.ball.x = canvas.width * 0.3;
+        this.ball.y = canvas.height * 0.35;
+        this.ball.vx = 0;
+        this.ball.vy = 0;
+        this.ball.scale = 0.6;
+        this.ball.state = 'pitching';
+        this.batter.x = canvas.width * 0.75;
+        this.batter.y = canvas.height * 0.75;
+        this.batter.swingAngle = -0.3;
+        this.batter.isSwinging = false;
+        this.batter.swingTimer = 0;
+        this.pitchTimer = 0;
+      },
+
+      moveLeft() {},
+      moveRight() {},
+
+      action() {
+        if (!this.batter.isSwinging) {
+          this.batter.isSwinging = true;
+          this.batter.swingTimer = 18;
+          sound.playBounce();
+
+          // Check hit collision with generous hitbox for ages 3-5
+          const plateX = this.batter.x - 30;
+          const plateY = this.batter.y - 10;
+          const distToPlate = Math.hypot(this.ball.x - plateX, this.ball.y - plateY);
+
+          if (distToPlate < 75 && this.ball.state === 'pitching') {
+            this.ball.state = 'hit';
+            this.ball.vx = -12 - Math.random() * 4;
+            this.ball.vy = -14 - Math.random() * 4;
+            sound.playHit();
+            createCelebration('HOME RUN! ⚾ BIG HIT!');
+            setTimeout(() => this.reset(), 1400);
+          }
+        }
+      },
+
+      update() {
+        // Pitching ball towards batter
+        if (this.ball.state === 'pitching') {
+          const targetX = this.batter.x - 30;
+          const targetY = this.batter.y - 10;
+          this.ball.x += (targetX - this.ball.x) * 0.055;
+          this.ball.y += (targetY - this.ball.y) * 0.055;
+          this.ball.scale = Math.min(1.2, this.ball.scale + 0.015);
+
+          // If ball reaches batter without swinging, auto reset softly
+          if (Math.abs(this.ball.x - targetX) < 10) {
+            setTimeout(() => this.reset(), 600);
+            this.ball.state = 'passed';
+          }
+        }
+
+        // Ball flying away on hit
+        if (this.ball.state === 'hit') {
+          this.ball.x += this.ball.vx;
+          this.ball.y += this.ball.vy;
+          this.ball.scale = Math.max(0.4, this.ball.scale - 0.015);
+        }
+
+        // Bat Swing Animation
+        if (this.batter.isSwinging) {
+          this.batter.swingTimer--;
+          this.batter.swingAngle += 0.25;
+          if (this.batter.swingTimer <= 0) {
+            this.batter.isSwinging = false;
+            this.batter.swingAngle = -0.3;
+          }
+        }
+      },
+
+      draw() {
+        // Field Diamond
+        ctx.fillStyle = '#15803d';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Dirt infield diamond
+        ctx.fillStyle = '#b45309';
+        ctx.beginPath();
+        ctx.moveTo(canvas.width * 0.5, canvas.height * 0.25);
+        ctx.lineTo(canvas.width * 0.85, canvas.height * 0.6);
+        ctx.lineTo(canvas.width * 0.5, canvas.height * 0.95);
+        ctx.lineTo(canvas.width * 0.15, canvas.height * 0.6);
+        ctx.closePath();
+        ctx.fill();
+
+        // Home Plate
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(this.batter.x - 30, this.batter.y, 25, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Batter Mascot 🐰
+        ctx.save();
+        ctx.translate(this.batter.x, this.batter.y);
+        ctx.fillStyle = '#cbd5e1';
+        ctx.beginPath(); ctx.arc(0, -25, 22, 0, Math.PI * 2); ctx.fill(); // Head
+        ctx.beginPath(); ctx.ellipse(-10, -50, 6, 18, -0.2, 0, Math.PI * 2); ctx.fill(); // Ear L
+        ctx.beginPath(); ctx.ellipse(10, -50, 6, 18, 0.2, 0, Math.PI * 2); ctx.fill(); // Ear R
+        ctx.fillStyle = '#000000';
+        ctx.beginPath(); ctx.arc(-7, -27, 3, 0, Math.PI * 2); ctx.arc(7, -27, 3, 0, Math.PI * 2); ctx.fill();
+
+        // Bat
+        ctx.rotate(this.batter.swingAngle);
+        ctx.fillStyle = '#f59e0b';
+        ctx.strokeStyle = '#78350f';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.roundRect(-8, -60, 16, 65, 8); ctx.fill(); ctx.stroke();
+        ctx.restore();
+
+        // Baseball
+        ctx.save();
+        ctx.translate(this.ball.x, this.ball.y);
+        ctx.scale(this.ball.scale, this.ball.scale);
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath(); ctx.arc(0, 0, this.ball.radius, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2.5; ctx.stroke();
+        ctx.restore();
+      }
+    };
+
+
+    /* ===================================================================
        7. MAIN GAME LOOP & CONTROLLERS
        =================================================================== */
     function startGame(mode) {
@@ -876,6 +1023,11 @@
         actionIcon.innerText = '🏀';
         actionText.innerText = 'TAP TO SHOOT!';
         basketballGame.reset();
+      } else if (currentMode === 'BASEBALL') {
+        activeGameText.innerText = 'Baseball Home Run Hitter! ⚾';
+        actionIcon.innerText = '⚾';
+        actionText.innerText = 'SWING!';
+        baseballGame.reset();
       }
     }
 
@@ -902,6 +1054,7 @@
       if (currentMode === 'SOCCER') soccerGame.action();
       else if (currentMode === 'FOOTBALL') footballGame.action();
       else if (currentMode === 'BASKETBALL') basketballGame.action();
+      else if (currentMode === 'BASEBALL') baseballGame.action();
     }
 
     // Action button handlers
@@ -918,6 +1071,7 @@
       if (currentMode === 'SOCCER') soccerGame.moveLeft();
       else if (currentMode === 'FOOTBALL') footballGame.moveLeft();
       else if (currentMode === 'BASKETBALL') basketballGame.moveLeft();
+      else if (currentMode === 'BASEBALL') baseballGame.moveLeft();
     });
     btnLeft.addEventListener('pointerup', () => { keyState.left = false; });
 
@@ -927,6 +1081,7 @@
       if (currentMode === 'SOCCER') soccerGame.moveRight();
       else if (currentMode === 'FOOTBALL') footballGame.moveRight();
       else if (currentMode === 'BASKETBALL') basketballGame.moveRight();
+      else if (currentMode === 'BASEBALL') baseballGame.moveRight();
     });
     btnRight.addEventListener('pointerup', () => { keyState.right = false; });
 
@@ -952,11 +1107,13 @@
         if (currentMode === 'SOCCER') soccerGame.moveLeft();
         else if (currentMode === 'FOOTBALL') footballGame.moveLeft();
         else if (currentMode === 'BASKETBALL') basketballGame.moveLeft();
+        else if (currentMode === 'BASEBALL') baseballGame.moveLeft();
       } else if (e.code === 'ArrowRight' || e.code === 'KeyD') {
         keyState.right = true;
         if (currentMode === 'SOCCER') soccerGame.moveRight();
         else if (currentMode === 'FOOTBALL') footballGame.moveRight();
         else if (currentMode === 'BASKETBALL') basketballGame.moveRight();
+        else if (currentMode === 'BASEBALL') baseballGame.moveRight();
       }
     });
 
@@ -984,32 +1141,34 @@
       } else if (currentMode === 'BASKETBALL') {
         basketballGame.update();
         basketballGame.draw();
+      } else if (currentMode === 'BASEBALL') {
+        baseballGame.update();
+        baseballGame.draw();
       } else {
-        // MENU Background
+        // MENU Background Animation
         backgroundAngle += 0.01;
-        ctx.fillStyle = '#38bdf8';
+        ctx.fillStyle = '#0284c7';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        for (let i = 0; i < 5; i++) {
-          const cx = (canvas.width * 0.2 * i + backgroundAngle * 30) % (canvas.width + 100) - 50;
-          const cy = 60 + Math.sin(backgroundAngle + i) * 15;
-          ctx.beginPath();
-          ctx.arc(cx, cy, 35, 0, Math.PI * 2);
-          ctx.arc(cx + 25, cy - 10, 25, 0, Math.PI * 2);
-          ctx.arc(cx - 25, cy - 10, 25, 0, Math.PI * 2);
-          ctx.fill();
+        ctx.save();
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate(backgroundAngle);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
+        for (let i = 0; i < 8; i++) {
+          ctx.rotate(Math.PI / 4);
+          ctx.fillRect(-canvas.width, -40, canvas.width * 2, 80);
         }
+        ctx.restore();
       }
 
       updateAndDrawParticles();
       requestAnimationFrame(gameLoop);
     }
 
-    // Window Init
-    window.onload = function() {
+    // Start loop and resize canvas when page loads
+    window.onload = () => {
       resizeCanvas();
-      requestAnimationFrame(gameLoop);
+      gameLoop();
     };
   </script>
 </body>
